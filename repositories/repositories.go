@@ -1,22 +1,19 @@
 package repositories
 
 import (
-	"blogs/initializers"
-
 	"gorm.io/gorm"
 )
 
 type Repository struct {
-	gormDB *gorm.DB
-	auth   AuthRepository
-	user   UserRepository
+	DB   *gorm.DB
+	Auth AuthRepository
+	User UserRepository
 }
 
-func GetRepository() *Repository {
-	db := initializers.GetDB()
+func GetRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		gormDB: db,
-		auth:   &authRepository{db},
-		user:   &userRepository{db},
+		DB:   db,
+		Auth: &authRepository{db},
+		User: &userRepository{db},
 	}
 }

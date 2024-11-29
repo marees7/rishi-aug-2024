@@ -2,15 +2,16 @@ package services
 
 import "blogs/repositories"
 
-type authServices struct {
-	authService AuthServices
-	userService UserServices
+type Services struct {
+	AuthService  AuthServices
+	UserService  UserServices
+	AdminService AdminServices
 }
 
-func GetService() *authServices {
-	repo := repositories.GetRepository()
-	return &authServices{
-		authService: &authService{repo},
-		userService: &userService{repo},
+func GetService(repo *repositories.Repository) *Services {
+	return &Services{
+		AuthService:  &authService{repo},
+		UserService:  &userService{repo},
+		AdminService: &adminService{repo},
 	}
 }

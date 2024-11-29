@@ -10,7 +10,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandlers interface {
@@ -20,19 +19,6 @@ type AuthHandlers interface {
 
 type authHandler struct {
 	services.AuthServices
-}
-
-type Handlers struct {
-	AdminHandlers
-	AuthHandlers
-	UserHandlers
-}
-
-func GetHandlerDB() *Handlers {
-	repo := services.GetService()
-	return &Handlers{
-		AdminHandlers: &adminHandler{},
-	}
 }
 
 func (handler *authHandler) Signup(ctx echo.Context) error {
@@ -48,23 +34,13 @@ func (handler *authHandler) Signup(ctx echo.Context) error {
 
 	if err := validation.Validation(&user); err != nil {
 		loggers.WarningLog.Println(err)
-		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
+		return ctx.JSON(http.StatusUnauthorized, helpers.ResponseJson{
 			Message: "Invalid data entered,check again",
 			Error:   err.Error(),
 		})
 	}
 
-	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	if err != nil {
-		loggers.WarningLog.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
-			Message: "Could not encrypt password",
-			Error:   err.Error(),
-		})
-	}
-	user.Password = string(hashedPass)
-
-	if err = handler.db.RegisterUser(&user); err != nil {
+	if err := handler.AuthServices.Signup(&user); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
 			Message: "Something went wrong",
@@ -89,18 +65,10 @@ func (handler *authHandler) Login(ctx echo.Context) error {
 		})
 	}
 
-	user, err := handler.db.LoginUser(&login)
+	user, err := handler.AuthServices.Login(&login)
 	if err != nil {
 		loggers.WarningLog.Println(err)
-		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-			Message: "Invalid email or password entered,check again",
-			Error:   err.Error(),
-		})
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password)); err != nil {
-		loggers.WarningLog.Println(err)
-		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
+		return ctx.JSON(http.StatusBadGateway, helpers.ResponseJson{
 			Message: "Invalid email or password entered,check again",
 			Error:   err.Error(),
 		})
@@ -109,7 +77,7 @@ func (handler *authHandler) Login(ctx echo.Context) error {
 	tokenstr, err := validation.GenerateToken(user)
 	if err != nil {
 		loggers.WarningLog.Println(err)
-		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
+		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
 			Message: "Could not generate token",
 			Error:   err.Error(),
 		})
