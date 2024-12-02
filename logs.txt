@@ -15,3 +15,162 @@ WARNING2024/11/29 19:43:52 user.go:174: cannot delete other users post
 INFO2024/11/29 19:55:53 connection.go:23: Connected to the server
 INFO2024/11/29 19:55:54 migration.go:17: Migrated tables successfully...
 WARNING2024/11/29 19:56:21 requireauth.go:35: token has invalid claims: token is expired
+INFO2024/12/02 11:09:30 connection.go:23: Connected to the server
+INFO2024/12/02 11:09:30 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 11:09:59 user.go:47: comments: unsupported relations for schema Users
+WARNING2024/12/02 11:09:59 user.go:63: comments: unsupported relations for schema Users
+INFO2024/12/02 11:10:41 connection.go:23: Connected to the server
+INFO2024/12/02 11:10:41 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 11:10:48 requireauth.go:35: token has invalid claims: token is expired
+WARNING2024/12/02 11:10:56 user.go:47: posts: unsupported relations for schema Users
+WARNING2024/12/02 11:10:56 user.go:63: posts: unsupported relations for schema Users
+INFO2024/12/02 11:13:49 connection.go:23: Connected to the server
+INFO2024/12/02 11:13:49 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 11:13:56 requireauth.go:35: token has invalid claims: token is expired
+WARNING2024/12/02 11:14:03 user.go:47: post: unsupported relations for schema Users
+WARNING2024/12/02 11:14:03 user.go:63: post: unsupported relations for schema Users
+INFO2024/12/02 11:18:27 connection.go:23: Connected to the server
+INFO2024/12/02 11:18:27 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 11:19:13 connection.go:23: Connected to the server
+INFO2024/12/02 11:19:13 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 11:19:19 requireauth.go:35: token has invalid claims: token is expired
+INFO2024/12/02 11:21:04 connection.go:23: Connected to the server
+INFO2024/12/02 11:21:04 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 11:28:52 connection.go:23: Connected to the server
+INFO2024/12/02 11:28:52 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 11:29:44 auth.go:24: ERROR: duplicate key value violates unique constraint "uni_users_email" (SQLSTATE 23505)
+WARNING2024/12/02 11:29:44 auth.go:44: ERROR: duplicate key value violates unique constraint "uni_users_email" (SQLSTATE 23505)
+WARNING2024/12/02 11:33:01 user.go:74: cannot update other users post
+WARNING2024/12/02 11:33:01 user.go:134: cannot update other users post
+INFO2024/12/02 11:54:39 connection.go:23: Connected to the server
+INFO2024/12/02 11:54:39 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 11:55:13 admin.go:34: only admins can access this page
+INFO2024/12/02 11:59:28 connection.go:23: Connected to the server
+INFO2024/12/02 11:59:28 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 12:18:54 connection.go:23: Connected to the server
+INFO2024/12/02 12:18:54 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 12:19:01 requireauth.go:20: http: named cookie not present
+INFO2024/12/02 12:23:05 connection.go:23: Connected to the server
+INFO2024/12/02 12:23:05 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 12:44:43 connection.go:23: Connected to the server
+INFO2024/12/02 12:44:43 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 12:45:02 user.go:62: no records found
+WARNING2024/12/02 12:45:11 user.go:62: no records found
+WARNING2024/12/02 12:45:15 admin.go:59: only admins can access this page
+WARNING2024/12/02 12:45:21 admin.go:59: no records found
+WARNING2024/12/02 12:46:31 admin.go:59: no records found
+INFO2024/12/02 12:49:59 connection.go:23: Connected to the server
+INFO2024/12/02 12:49:59 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 12:50:10 admin.go:63: no records found
+WARNING2024/12/02 12:50:17 admin.go:63: no records found
+INFO2024/12/02 12:54:51 connection.go:23: Connected to the server
+INFO2024/12/02 12:54:51 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 13:42:18 connection.go:23: Connected to the server
+INFO2024/12/02 13:42:18 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 13:42:30 requireauth.go:20: http: named cookie not present
+WARNING2024/12/02 13:42:55 user.go:228: strconv.Atoi: parsing "": invalid syntax
+INFO2024/12/02 13:44:47 connection.go:23: Connected to the server
+INFO2024/12/02 13:44:47 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 13:44:54 user.go:241: specify either start and end date or use post id
+INFO2024/12/02 13:45:27 connection.go:23: Connected to the server
+INFO2024/12/02 13:45:27 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 13:45:34 user.go:241: specify either start and end date or use post id
+WARNING2024/12/02 13:45:51 user.go:241: no records found
+INFO2024/12/02 13:49:59 connection.go:23: Connected to the server
+INFO2024/12/02 13:49:59 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 13:50:50 user.go:241: end date is not specified
+WARNING2024/12/02 13:51:06 user.go:241: start date is not specified
+INFO2024/12/02 13:56:57 connection.go:23: Connected to the server
+INFO2024/12/02 13:56:57 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 13:57:07 requireauth.go:20: http: named cookie not present
+INFO2024/12/02 15:06:01 connection.go:23: Connected to the server
+INFO2024/12/02 15:06:01 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 15:06:13 requireauth.go:20: http: named cookie not present
+WARNING2024/12/02 15:07:27 user.go:265: record not found
+WARNING2024/12/02 15:07:27 user.go:400: record not found
+WARNING2024/12/02 15:07:36 user.go:265: record not found
+WARNING2024/12/02 15:07:36 user.go:400: record not found
+WARNING2024/12/02 15:07:40 user.go:265: record not found
+WARNING2024/12/02 15:07:40 user.go:400: record not found
+INFO2024/12/02 15:13:04 connection.go:23: Connected to the server
+INFO2024/12/02 15:13:04 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 15:13:13 user.go:265: record not found
+WARNING2024/12/02 15:13:13 user.go:399: record not found
+WARNING2024/12/02 15:13:28 user.go:265: record not found
+WARNING2024/12/02 15:13:28 user.go:399: record not found
+INFO2024/12/02 15:58:30 connection.go:23: Connected to the server
+INFO2024/12/02 15:58:30 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 15:59:21 user.go:244: Cannot update other users comment
+WARNING2024/12/02 15:59:21 user.go:331: cannot update other users comment
+WARNING2024/12/02 16:01:16 user.go:265: record not found
+WARNING2024/12/02 16:01:16 user.go:371: record not found
+INFO2024/12/02 16:09:45 connection.go:23: Connected to the server
+INFO2024/12/02 16:09:46 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 16:09:54 user.go:265: record not found
+WARNING2024/12/02 16:09:54 user.go:371: record not found
+WARNING2024/12/02 16:11:15 user.go:268: Cannot delete other users comment
+WARNING2024/12/02 16:11:15 user.go:371: cannot delete other users comment
+INFO2024/12/02 16:33:19 connection.go:23: Connected to the server
+INFO2024/12/02 16:33:19 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 16:33:30 requireauth.go:20: http: named cookie not present
+WARNING2024/12/02 16:33:55 user.go:245: specify either start and end date or use post id
+INFO2024/12/02 16:42:25 connection.go:23: Connected to the server
+INFO2024/12/02 16:42:25 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 16:43:26 user.go:266: record not found
+WARNING2024/12/02 16:43:26 user.go:390: record not found
+WARNING2024/12/02 16:44:03 user.go:242: record not found
+WARNING2024/12/02 16:44:03 user.go:346: record not found
+WARNING2024/12/02 16:44:08 user.go:242: record not found
+WARNING2024/12/02 16:44:08 user.go:346: record not found
+WARNING2024/12/02 16:44:32 user.go:333: code=400, message=Syntax error: offset=39, error=invalid character '}' looking for beginning of object key string, internal=invalid character '}' looking for beginning of object key string
+INFO2024/12/02 16:50:12 connection.go:23: Connected to the server
+INFO2024/12/02 16:50:12 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 16:52:36 user.go:74: cannot update other users post
+WARNING2024/12/02 16:52:36 user.go:166: cannot update other users post
+INFO2024/12/02 16:54:40 connection.go:23: Connected to the server
+INFO2024/12/02 16:54:40 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 16:55:15 user.go:98: cannot delete other users post
+WARNING2024/12/02 16:55:15 user.go:209: cannot delete other users post
+WARNING2024/12/02 16:56:02 user.go:266: record not found
+WARNING2024/12/02 16:56:02 user.go:386: record not found
+WARNING2024/12/02 16:56:22 admin.go:116: only admins can access this page
+INFO2024/12/02 17:00:13 connection.go:23: Connected to the server
+INFO2024/12/02 17:00:13 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 17:22:59 connection.go:23: Connected to the server
+INFO2024/12/02 17:22:59 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 17:23:08 auth.go:36: record not found
+WARNING2024/12/02 17:23:08 auth.go:70: record not found
+INFO2024/12/02 17:26:44 connection.go:23: Connected to the server
+INFO2024/12/02 17:26:44 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 17:26:49 requireauth.go:20: http: named cookie not present
+INFO2024/12/02 17:29:17 connection.go:23: Connected to the server
+INFO2024/12/02 17:29:17 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 17:50:17 connection.go:23: Connected to the server
+INFO2024/12/02 17:50:17 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 17:50:37 connection.go:23: Connected to the server
+INFO2024/12/02 17:50:37 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 17:55:11 connection.go:23: Connected to the server
+INFO2024/12/02 17:55:11 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 17:57:19 connection.go:23: Connected to the server
+INFO2024/12/02 17:57:19 migration.go:17: Migrated tables successfully...
+INFO2024/12/02 17:58:37 connection.go:23: Connected to the server
+INFO2024/12/02 17:58:37 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 17:59:05 user.go:98: cannot delete other users post
+WARNING2024/12/02 17:59:05 user.go:209: cannot delete other users post
+WARNING2024/12/02 17:59:15 user.go:266: record not found
+WARNING2024/12/02 17:59:15 user.go:377: record not found
+WARNING2024/12/02 17:59:33 user.go:146: ERROR: duplicate key value violates unique constraint "uni_categories_category_name" (SQLSTATE 23505)
+WARNING2024/12/02 17:59:33 admin.go:116: ERROR: duplicate key value violates unique constraint "uni_categories_category_name" (SQLSTATE 23505)
+WARNING2024/12/02 17:59:40 user.go:188: record not found
+WARNING2024/12/02 17:59:40 admin.go:196: record not found
+INFO2024/12/02 18:34:03 connection.go:23: Connected to the server
+INFO2024/12/02 18:34:03 migration.go:17: Migrated tables successfully...
+WARNING2024/12/02 18:36:00 user.go:98: cannot delete other users post
+WARNING2024/12/02 18:36:00 user.go:209: cannot delete other users post
+WARNING2024/12/02 18:37:17 user.go:285: code=400, message=Syntax error: offset=56, error=invalid character '}' looking for beginning of object key string, internal=invalid character '}' looking for beginning of object key string
+WARNING2024/12/02 18:38:59 user.go:211: ERROR: insert or update on table "comments" violates foreign key constraint "fk_posts_comments" (SQLSTATE 23503)
+WARNING2024/12/02 18:38:59 user.go:295: ERROR: insert or update on table "comments" violates foreign key constraint "fk_posts_comments" (SQLSTATE 23503)
+WARNING2024/12/02 18:39:32 user.go:242: record not found
+WARNING2024/12/02 18:39:32 user.go:335: record not found
+WARNING2024/12/02 18:39:44 user.go:266: record not found
+WARNING2024/12/02 18:39:44 user.go:377: record not found
