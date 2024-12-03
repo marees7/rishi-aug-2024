@@ -22,9 +22,10 @@ type JWTClaims struct {
 }
 
 type UserView struct {
-	Username string      `json:"username"`
-	Email    string      `json:"email"`
-	Role     string      `json:"role"`
-	Comments interface{} `json:"comments"`
-	Posts    interface{} `json:"posts"`
+	UserID   int         `json:"user_id,omitempty"`
+	Username string      `json:"username,omitempty"`
+	Email    string      `json:"email,omitempty"`
+	Role     string      `json:"role,omitempty"`
+	Comments interface{} `json:"comments,omitempty"`
+	Posts    interface{} `json:"posts,omitempty"`
 }

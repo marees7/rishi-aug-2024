@@ -17,6 +17,7 @@ type authService struct {
 	*repositories.Repository
 }
 
+//hashes the password and sends it to the db
 func (repo *authService) Signup(user *models.Users) error {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
@@ -30,6 +31,7 @@ func (repo *authService) Signup(user *models.Users) error {
 	return nil
 }
 
+//compares the hashed password lets the user login
 func (repo *authService) Login(login *helpers.LoginRequest) (*models.Users, error) {
 	user, err := repo.Auth.LoginUser(login)
 	if err != nil {

@@ -12,16 +12,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type AuthHandlers interface {
-	Signup(ctx echo.Context) error
-	Login(ctx echo.Context) error
-}
-
-type authHandler struct {
+type AuthHandler struct {
 	services.AuthServices
 }
 
-func (handler *authHandler) Signup(ctx echo.Context) error {
+// register an new user
+func (handler *AuthHandler) Signup(ctx echo.Context) error {
 	var user models.Users
 
 	if err := ctx.Bind(&user); err != nil {
@@ -31,6 +27,7 @@ func (handler *authHandler) Signup(ctx echo.Context) error {
 		})
 	}
 
+	//check if the given info is valid
 	if err := validation.Validation(&user); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
@@ -38,6 +35,7 @@ func (handler *authHandler) Signup(ctx echo.Context) error {
 		})
 	}
 
+	//call the signup service
 	if err := handler.AuthServices.Signup(&user); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
@@ -51,7 +49,8 @@ func (handler *authHandler) Signup(ctx echo.Context) error {
 	})
 }
 
-func (handler *authHandler) Login(ctx echo.Context) error {
+// validate and sign-in a user
+func (handler *AuthHandler) Login(ctx echo.Context) error {
 	var login helpers.LoginRequest
 
 	if err := ctx.Bind(&login); err != nil {
@@ -61,6 +60,14 @@ func (handler *authHandler) Login(ctx echo.Context) error {
 		})
 	}
 
+	if login.Email == "" || login.Password == "" {
+		loggers.WarningLog.Println("invalid username or password")
+		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
+			Error: "invalid username or password",
+		})
+	}
+
+	//call the login service
 	user, err := handler.AuthServices.Login(&login)
 	if err != nil {
 		loggers.WarningLog.Println(err)
@@ -69,6 +76,7 @@ func (handler *authHandler) Login(ctx echo.Context) error {
 		})
 	}
 
+	//generate a new token
 	tokenstr, err := validation.GenerateToken(user)
 	if err != nil {
 		loggers.WarningLog.Println(err)
@@ -77,6 +85,7 @@ func (handler *authHandler) Login(ctx echo.Context) error {
 		})
 	}
 
+	//use the generated token to set a new cookie
 	ctx.SetCookie(&http.Cookie{
 		Name:     "Authorization",
 		Value:    tokenstr,

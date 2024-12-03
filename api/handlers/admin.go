@@ -1,89 +1,85 @@
 package handlers
 
 import (
+	"blogs/api/services"
 	"blogs/common/helpers"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
-	"blogs/api/services"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
-type AdminHandlers interface {
-	GetAllUsers(ctx echo.Context) error
-	GetSingleUser(ctx echo.Context) error
-	CreateCategory(ctx echo.Context) error
-	UpdateCategory(ctx echo.Context) error
-	DeleteCategory(ctx echo.Context) error
-}
-
-type adminHandler struct {
+type AdminHandler struct {
 	services.AdminServices
 }
 
-func (handler *adminHandler) GetAllUsers(ctx echo.Context) error {
+// retrieve every users records
+func (handler *AdminHandler) GetAllUsers(ctx echo.Context) error {
 	var users []models.Users
 	var limit, offset int
 
 	param := ctx.QueryParam("limit")
-	limit, err := strconv.Atoi(param)
-	if err != nil {
-		if param == "" {
-			limit = 100
-		} else {
+	if param == "" {
+		limit = 100
+	} else {
+		convLimit, err := strconv.Atoi(param)
+		if err != nil {
 			loggers.WarningLog.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-				Error:   err.Error(),
+				Error: err.Error(),
 			})
 		}
+		limit = convLimit
 	}
 
 	param = ctx.QueryParam("offset")
-	offset, err = strconv.Atoi(param)
-	if err != nil {
-		if param == "" {
-			offset = 0
-		} else {
+	if param == "" {
+		offset = 0
+	} else {
+		convOffset, err := strconv.Atoi(param)
+		if err != nil {
 			loggers.WarningLog.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-				Error:   err.Error(),
+				Error: err.Error(),
 			})
 		}
+		offset = convOffset
 	}
 
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the get Users service
 	status, err := handler.AdminServices.GetUsers(&users, role, limit, offset)
 	if err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
-	ctx.JSON(status, helpers.ResponseJson{
+	return ctx.JSON(status, helpers.ResponseJson{
 		Message: "Users retreived successfully",
 		Data:    users,
 	})
-
-	return nil
 }
 
-func (handler *adminHandler) GetSingleUser(ctx echo.Context) error {
+// retrieve a single user record
+func (handler *AdminHandler) GetSingleUser(ctx echo.Context) error {
 	var user models.Users
 	username := ctx.Param("username")
 
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the get User By ID service
 	status, err := handler.AdminServices.GetUserByID(&user, username, role)
 	if err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
@@ -93,24 +89,26 @@ func (handler *adminHandler) GetSingleUser(ctx echo.Context) error {
 	})
 }
 
-func (handler *adminHandler) CreateCategory(ctx echo.Context) error {
+// create a new category
+func (handler *AdminHandler) CreateCategory(ctx echo.Context) error {
 	var category models.Categories
 
 	if err := ctx.Bind(&category); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the create Category service
 	status, err := handler.AdminServices.CreateCategory(&category, role)
 	if err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
@@ -120,7 +118,8 @@ func (handler *adminHandler) CreateCategory(ctx echo.Context) error {
 	})
 }
 
-func (handler *adminHandler) UpdateCategory(ctx echo.Context) error {
+// update an existing category
+func (handler *AdminHandler) UpdateCategory(ctx echo.Context) error {
 	var category models.Categories
 	id := ctx.Param("category_id")
 
@@ -128,24 +127,25 @@ func (handler *adminHandler) UpdateCategory(ctx echo.Context) error {
 	if err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&category); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the update category service
 	if status, err := handler.AdminServices.UpdateCategory(&category, categoryid, role); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
@@ -159,7 +159,8 @@ func (handler *adminHandler) UpdateCategory(ctx echo.Context) error {
 	})
 }
 
-func (handler *adminHandler) DeleteCategory(ctx echo.Context) error {
+// delete an existing category
+func (handler *AdminHandler) DeleteCategory(ctx echo.Context) error {
 	var category models.Categories
 	id := ctx.Param("category_id")
 
@@ -167,29 +168,32 @@ func (handler *adminHandler) DeleteCategory(ctx echo.Context) error {
 	if err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&category); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the delete category service
 	if status, err := handler.AdminServices.DeleteCategory(&category, categoryid, role); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
-			Error:   err.Error(),
+			Error: err.Error(),
 		})
 	}
 
 	return ctx.JSON(http.StatusOK, helpers.ResponseJson{
 		Message: "Category deleted successfully",
-		Data:    category.DeletedAt,
+		Data: map[string]interface{}{
+			"deleted_at": category.DeletedAt,
+		},
 	})
 }

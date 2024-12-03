@@ -19,6 +19,7 @@ type adminService struct {
 	*repositories.Repository
 }
 
+// retrieve every users records
 func (repo *adminService) GetUsers(users *[]models.Users, role string, limit, offset int) (int, error) {
 	if role == "admin" {
 		if status, err := repo.User.RetrieveUsers(users, limit, offset); err != nil {
@@ -30,6 +31,7 @@ func (repo *adminService) GetUsers(users *[]models.Users, role string, limit, of
 	return http.StatusOK, nil
 }
 
+// retrieve a single user records
 func (repo *adminService) GetUserByID(users *models.Users, username string, role string) (int, error) {
 	if role == "admin" {
 		if status, err := repo.User.RetrieveSingleUser(users, username); err != nil {
@@ -41,6 +43,7 @@ func (repo *adminService) GetUserByID(users *models.Users, username string, role
 	return http.StatusOK, nil
 }
 
+// create a new category
 func (repo *adminService) CreateCategory(category *models.Categories, role string) (int, error) {
 	if role == "admin" {
 		if status, err := repo.User.CreateCategory(category); err != nil {
@@ -52,6 +55,7 @@ func (repo *adminService) CreateCategory(category *models.Categories, role strin
 	return http.StatusCreated, nil
 }
 
+// update a existing category
 func (repo *adminService) UpdateCategory(category *models.Categories, categoryid int, role string) (int, error) {
 	if role == "admin" {
 		if status, err := repo.User.UpdateCategory(category, categoryid); err != nil {
@@ -63,6 +67,7 @@ func (repo *adminService) UpdateCategory(category *models.Categories, categoryid
 	return http.StatusOK, nil
 }
 
+//delete a existing category
 func (repo *adminService) DeleteCategory(category *models.Categories, categoryid int, role string) (int, error) {
 	if role == "admin" {
 		if status, err := repo.User.DeleteCategory(category, categoryid); err != nil {

@@ -11,53 +11,45 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandlers interface {
-	GetUsers(ctx echo.Context) error
-	GetUserWithUsername(ctx echo.Context) error
-	CreatePost(ctx echo.Context) error
-	UpdatePost(ctx echo.Context) error
-	DeletePost(ctx echo.Context) error
-	GetPosts(ctx echo.Context) error
-	Getcategories(ctx echo.Context) error
-	CreateComment(ctx echo.Context) error
-	UpdateComment(ctx echo.Context) error
-	DeleteComment(ctx echo.Context) error
-}
-
-type userHandler struct {
+type UserHandler struct {
 	services.UserServices
 }
 
-func (handler *userHandler) GetUsers(ctx echo.Context) error {
+// retrieve every users public fields
+func (handler *UserHandler) GetUsers(ctx echo.Context) error {
 	var users []models.Users
+	var view []helpers.UserView
 	var limit, offset int
 
 	param := ctx.QueryParam("limit")
-	limit, err := strconv.Atoi(param)
-	if err != nil {
-		if param == "" {
-			limit = 100
-		} else {
+	if param == "" {
+		limit = 100
+	} else {
+		convLimit, err := strconv.Atoi(param)
+		if err != nil {
 			loggers.WarningLog.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Error: err.Error(),
 			})
 		}
+		limit = convLimit
 	}
 
 	param = ctx.QueryParam("offset")
-	offset, err = strconv.Atoi(param)
-	if err != nil {
-		if param == "" {
-			offset = 0
-		} else {
+	if param == "" {
+		offset = 0
+	} else {
+		convOffset, err := strconv.Atoi(param)
+		if err != nil {
 			loggers.WarningLog.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Error: err.Error(),
 			})
 		}
+		offset = convOffset
 	}
 
+	//call the get Users service
 	status, err := handler.UserServices.GetUsers(&users, limit, offset)
 	if err != nil {
 		loggers.WarningLog.Println(err)
@@ -66,25 +58,32 @@ func (handler *userHandler) GetUsers(ctx echo.Context) error {
 		})
 	}
 
+	//used another struct to show only public fields
 	for _, user := range users {
-		ctx.JSON(http.StatusOK, helpers.ResponseJson{
-			Data: map[string]interface{}{
-				"posts":    user.Posts,
-				"comments": user.Comments,
-				"username": user.Username,
-				"email":    user.Email,
-				"user_id":  user.UserID,
-			},
-		})
+		publicFields := helpers.UserView{
+			UserID:   user.UserID,
+			Username: user.Username,
+			Email:    user.Email,
+			Role:     user.Role,
+			Comments: user.Comments,
+			Posts:    user.Posts,
+		}
+		view = append(view, publicFields)
 	}
-	return nil
+
+	return ctx.JSON(http.StatusOK, helpers.ResponseJson{
+		Message: "retrieved records successfully",
+		Data:    view,
+	})
 }
 
-func (handler *userHandler) GetUserWithUsername(ctx echo.Context) error {
+// retrieve single user public fields using username
+func (handler *UserHandler) GetUserWithUsername(ctx echo.Context) error {
 	var user models.Users
 
 	username := ctx.Param("username")
 
+	//call the get User by id service
 	status, err := handler.UserServices.GetUserByID(&user, username)
 	if err != nil {
 		loggers.WarningLog.Println(err)
@@ -95,17 +94,19 @@ func (handler *userHandler) GetUserWithUsername(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, helpers.ResponseJson{
 		Message: "User retreived successfully",
-		Data: map[string]interface{}{
-			"posts":    user.Posts,
-			"comments": user.Comments,
-			"username": user.Username,
-			"email":    user.Email,
-			"user_id":  user.UserID,
+		Data: &helpers.UserView{
+			UserID:   user.UserID,
+			Username: user.Username,
+			Email:    user.Email,
+			Role:     user.Role,
+			Comments: user.Comments,
+			Posts:    user.Posts,
 		},
 	})
 }
 
-func (handler *userHandler) CreatePost(ctx echo.Context) error {
+// create a new post
+func (handler *UserHandler) CreatePost(ctx echo.Context) error {
 	var post models.Posts
 
 	if err := ctx.Bind(&post); err != nil {
@@ -117,6 +118,7 @@ func (handler *userHandler) CreatePost(ctx echo.Context) error {
 	user := ctx.Get("user_id")
 	userid := int(user.(float64))
 
+	//call the create post service
 	if status, err := handler.UserServices.CreatePost(&post, userid); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
@@ -130,7 +132,8 @@ func (handler *userHandler) CreatePost(ctx echo.Context) error {
 	})
 }
 
-func (handler *userHandler) UpdatePost(ctx echo.Context) error {
+// update a existing post
+func (handler *UserHandler) UpdatePost(ctx echo.Context) error {
 	var post models.Posts
 	id := ctx.Param("post_id")
 
@@ -154,6 +157,7 @@ func (handler *userHandler) UpdatePost(ctx echo.Context) error {
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the update post service
 	if status, err := handler.UserServices.UpdatePost(&post, userid, postid, role); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
@@ -171,7 +175,8 @@ func (handler *userHandler) UpdatePost(ctx echo.Context) error {
 	})
 }
 
-func (handler *userHandler) DeletePost(ctx echo.Context) error {
+// Delete a existing post
+func (handler *UserHandler) DeletePost(ctx echo.Context) error {
 	var post models.Posts
 	id := ctx.Param("post_id")
 
@@ -195,6 +200,7 @@ func (handler *userHandler) DeletePost(ctx echo.Context) error {
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the delete post service
 	if status, err := handler.UserServices.DeletePost(&post, userid, postid, role); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
@@ -207,7 +213,8 @@ func (handler *userHandler) DeletePost(ctx echo.Context) error {
 	})
 }
 
-func (handler *userHandler) GetPosts(ctx echo.Context) error {
+// retrieve every users posts using date filter or specific id
+func (handler *UserHandler) GetPosts(ctx echo.Context) error {
 	var posts []models.Posts
 
 	startDate := ctx.QueryParam("start_date")
@@ -226,6 +233,7 @@ func (handler *userHandler) GetPosts(ctx echo.Context) error {
 		}
 	}
 
+	//call the retrieve post service
 	status, err := handler.UserServices.RetrievePost(&posts, startDate, endDate, postid)
 	if err != nil {
 		loggers.WarningLog.Println(err)
@@ -240,9 +248,11 @@ func (handler *userHandler) GetPosts(ctx echo.Context) error {
 	})
 }
 
-func (handler *userHandler) Getcategories(ctx echo.Context) error {
+// retrieve every categories available
+func (handler *UserHandler) Getcategories(ctx echo.Context) error {
 	var categories []models.Categories
 
+	//call the retrieve category service
 	status, err := handler.UserServices.RetrieveCategories(&categories)
 	if err != nil {
 		loggers.WarningLog.Println(err)
@@ -254,7 +264,8 @@ func (handler *userHandler) Getcategories(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, categories)
 }
 
-func (handler *userHandler) CreateComment(ctx echo.Context) error {
+// Create a new comment for a post
+func (handler *UserHandler) CreateComment(ctx echo.Context) error {
 	var comment models.Comments
 	id := ctx.Param("post_id")
 
@@ -275,6 +286,7 @@ func (handler *userHandler) CreateComment(ctx echo.Context) error {
 	user := ctx.Get("user_id")
 	userid := int(user.(float64))
 
+	//call the create comment service
 	if status, err := handler.UserServices.CreateComment(&comment, userid, postid); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
@@ -288,7 +300,8 @@ func (handler *userHandler) CreateComment(ctx echo.Context) error {
 	})
 }
 
-func (handler *userHandler) UpdateComment(ctx echo.Context) error {
+// update an existing comment
+func (handler *UserHandler) UpdateComment(ctx echo.Context) error {
 	var comment models.Comments
 	id := ctx.Param("comment_id")
 
@@ -312,6 +325,7 @@ func (handler *userHandler) UpdateComment(ctx echo.Context) error {
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the update comment service
 	if status, err := handler.UserServices.UpdateComment(&comment, userid, commentid, role); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
@@ -327,7 +341,8 @@ func (handler *userHandler) UpdateComment(ctx echo.Context) error {
 	})
 }
 
-func (handler *userHandler) DeleteComment(ctx echo.Context) error {
+// delete an existing comment
+func (handler *UserHandler) DeleteComment(ctx echo.Context) error {
 	var comment models.Comments
 	id := ctx.Param("comment_id")
 
@@ -351,6 +366,7 @@ func (handler *userHandler) DeleteComment(ctx echo.Context) error {
 	getRole := (ctx.Get("role"))
 	role := getRole.(string)
 
+	//call the delete comment service
 	if status, err := handler.UserServices.DeleteComment(&comment, userid, commentid, role); err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
@@ -363,7 +379,8 @@ func (handler *userHandler) DeleteComment(ctx echo.Context) error {
 	})
 }
 
-func (handler *userHandler) GetComments(ctx echo.Context) error {
+// retrieve every comments of the post
+func (handler *UserHandler) GetComments(ctx echo.Context) error {
 	var comments []models.Comments
 
 	id := ctx.Param("post_id")
@@ -376,6 +393,7 @@ func (handler *userHandler) GetComments(ctx echo.Context) error {
 		})
 	}
 
+	//call the retrieve comment service
 	status, err := handler.UserServices.RetrieveComment(&comments, postid)
 	if err != nil {
 		loggers.WarningLog.Println(err)

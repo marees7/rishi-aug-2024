@@ -6,6 +6,7 @@ import (
 	"net/mail"
 )
 
+//validates the required fields
 func Validation(user *models.Users) error {
 	//check email address
 	_, err := mail.ParseAddress(user.Email)

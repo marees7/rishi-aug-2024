@@ -1,9 +1,8 @@
-package initializers
+package internals
 
 import (
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
-	"fmt"
 )
 
 func Migrate() {
@@ -11,9 +10,7 @@ func Migrate() {
 
 	err := db.AutoMigrate(&models.Users{}, &models.Categories{}, &models.Posts{}, &models.Comments{})
 	if err != nil {
-		fmt.Println("Could not migrate tables", err)
 		loggers.ErrorLog.Fatalln(err)
 	}
 	loggers.InfoLog.Println("Migrated tables successfully...")
-	fmt.Println("Migrated tables successfully...")
 }

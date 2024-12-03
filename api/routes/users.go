@@ -3,16 +3,19 @@ package routes
 import (
 	"blogs/api/handlers"
 	"blogs/api/middlewares"
+	"blogs/api/services"
 
 	"github.com/labstack/echo/v4"
 )
 
-func UserRoute(server *echo.Echo, handler *handlers.Handlers) {
-	users := server.Group("/users")
+func UserRoute(server *echo.Echo, service *services.Services) {
+	handler := &handlers.UserHandler{UserServices: service.UserService}
+
+	users := server.Group("/users/v1")
 	users.Use(middlewares.RequireAuth)
 
-	users.GET("/user", handler.GetUsers)
-	users.GET("/user/:username", handler.GetUserWithUsername)
+	users.GET("/", handler.GetUsers)
+	users.GET("/:username", handler.GetUserWithUsername)
 	users.GET("/categories", handler.Getcategories)
 	users.POST("/posts", handler.CreatePost)
 	users.GET("/posts", handler.GetPosts)

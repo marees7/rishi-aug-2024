@@ -1,4 +1,4 @@
-package initializers
+package internals
 
 import (
 	"fmt"
@@ -6,10 +6,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func recoverPanic() {
+	if r := recover(); r != nil {
+		fmt.Println("recovered from ", r)
+	}
+}
+
 func LoadEnv() {
-	err := godotenv.Load(".env")
+	defer recoverPanic()
+
+	err := godotenv.Load("E:/Exercises/golang/rte_project/rishi-aug-2024/.env")
 	if err != nil {
-		fmt.Println("Error loading env file", err)
-		return
+		panic(err)
 	}
 }

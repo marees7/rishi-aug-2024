@@ -11,7 +11,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+//generate a new token for the user
 func GenerateToken(user *models.Users) (string, error) {
+	//set claims with needed data and expire time if needed
 	claims := &helpers.JWTClaims{
 		Userid:   user.UserID,
 		Username: user.Username,
@@ -22,8 +24,10 @@ func GenerateToken(user *models.Users) (string, error) {
 		},
 	}
 
+	//creates a jwt token with the claims and signing method
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
+	//creates a token string
 	tokenstr, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
 		loggers.WarningLog.Println(err)
@@ -33,6 +37,7 @@ func GenerateToken(user *models.Users) (string, error) {
 	return tokenstr, nil
 }
 
+//retrieve the data inside the claims
 func GetClaims(token *jwt.Token) (jwt.MapClaims, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
