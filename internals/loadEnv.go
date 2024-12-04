@@ -2,6 +2,8 @@ package internals
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 )
@@ -15,8 +17,12 @@ func recoverPanic() {
 func LoadEnv() {
 	defer recoverPanic()
 
-	err := godotenv.Load("E:/Exercises/golang/rte_project/rishi-aug-2024/.env")
+	wd, err := os.Getwd()
 	if err != nil {
+		panic(err)
+	}
+
+	if err = godotenv.Load(filepath.Join(filepath.Dir(wd), ".env")); err != nil {
 		panic(err)
 	}
 }

@@ -11,7 +11,7 @@ import (
 func UserRoute(server *echo.Echo, service *services.Services) {
 	handler := &handlers.UserHandler{UserServices: service.UserService}
 
-	users := server.Group("/users/v1")
+	users := server.Group("v1/users")
 	users.Use(middlewares.RequireAuth)
 
 	users.GET("/", handler.GetUsers)

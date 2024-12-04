@@ -9,7 +9,7 @@ import (
 
 type AdminServices interface {
 	GetUsers(users *[]models.Users, role string, limit, offset int) (int, error)
-	GetUserByID(users *models.Users, username string, role string) (int, error)
+	GetUserByUsername(users *models.Users, username string, role string) (int, error)
 	CreateCategory(category *models.Categories, role string) (int, error)
 	UpdateCategory(category *models.Categories, categoryid int, role string) (int, error)
 	DeleteCategory(category *models.Categories, categoryid int, role string) (int, error)
@@ -32,7 +32,7 @@ func (repo *adminService) GetUsers(users *[]models.Users, role string, limit, of
 }
 
 // retrieve a single user records
-func (repo *adminService) GetUserByID(users *models.Users, username string, role string) (int, error) {
+func (repo *adminService) GetUserByUsername(users *models.Users, username string, role string) (int, error) {
 	if role == "admin" {
 		if status, err := repo.User.RetrieveSingleUser(users, username); err != nil {
 			return status, err
@@ -67,7 +67,7 @@ func (repo *adminService) UpdateCategory(category *models.Categories, categoryid
 	return http.StatusOK, nil
 }
 
-//delete a existing category
+// delete a existing category
 func (repo *adminService) DeleteCategory(category *models.Categories, categoryid int, role string) (int, error) {
 	if role == "admin" {
 		if status, err := repo.User.DeleteCategory(category, categoryid); err != nil {

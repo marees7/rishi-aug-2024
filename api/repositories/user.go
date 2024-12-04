@@ -50,7 +50,7 @@ func (db *userRepository) RetrieveSingleUser(user *models.Users, username string
 	//retrieve a single user record along with comments and posts
 	data := db.Preload("Posts").Preload("Comments").Where("username=?", username).First(&user)
 	if data.RowsAffected == 0 {
-		return http.StatusOK, nil
+		return http.StatusOK, fmt.Errorf("no records found")
 	}
 	if data.Error != nil {
 		loggers.WarningLog.Println(data.Error.Error())
@@ -138,7 +138,6 @@ func (db *userRepository) RetrievePost(post *[]models.Posts, startdate string, e
 			loggers.WarningLog.Println(data.Error.Error())
 			return http.StatusInternalServerError, data.Error
 		}
-
 	} else if startdate != "" && enddate != "" {
 		data := db.Where("created_at BETWEEN ? AND ?", startdate, enddate).Find(&post)
 		if data.Error != nil {
@@ -158,6 +157,15 @@ func (db *userRepository) RetrievePost(post *[]models.Posts, startdate string, e
 				loggers.WarningLog.Println(data.Error.Error())
 				return http.StatusInternalServerError, data.Error
 			}
+		}
+	} else {
+		data := db.Find(&post)
+		if data.RowsAffected == 0 {
+			return http.StatusOK, nil
+		}
+		if data.Error != nil {
+			loggers.WarningLog.Println(data.Error.Error())
+			return http.StatusInternalServerError, data.Error
 		}
 	}
 	return http.StatusOK, nil

@@ -72,8 +72,6 @@ func (repo userService) RetrievePost(posts *[]models.Posts, startdate string, en
 		return http.StatusBadRequest, fmt.Errorf("start date is not specified")
 	} else if startdate != "" && enddate == "" {
 		return http.StatusBadRequest, fmt.Errorf("end date is not specified")
-	} else if startdate == "" && enddate == "" && postid == 0 {
-		return http.StatusBadRequest, fmt.Errorf("specify either start and end date or use post id")
 	} else if status, err := repo.User.RetrievePost(posts, startdate, enddate, postid); err != nil {
 		return status, err
 	}

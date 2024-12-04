@@ -75,7 +75,7 @@ func (handler *AdminHandler) GetSingleUser(ctx echo.Context) error {
 	role := getRole.(string)
 
 	//call the get User By ID service
-	status, err := handler.AdminServices.GetUserByID(&user, username, role)
+	status, err := handler.AdminServices.GetUserByUsername(&user, username, role)
 	if err != nil {
 		loggers.WarningLog.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{

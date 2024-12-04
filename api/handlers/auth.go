@@ -60,10 +60,17 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 		})
 	}
 
-	if login.Email == "" || login.Password == "" {
-		loggers.WarningLog.Println("invalid username or password")
+	if login.Email == "" {
+		loggers.WarningLog.Println("email cannot be empty")
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
-			Error: "invalid username or password",
+			Error: "email cannot be empty",
+		})
+	}
+
+	if login.Password == "" {
+		loggers.WarningLog.Println("password cannot be empty")
+		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
+			Error: "password cannot be empty",
 		})
 	}
 

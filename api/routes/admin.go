@@ -11,7 +11,7 @@ import (
 func AdminRoute(server *echo.Echo, service *services.Services) {
 	handler := &handlers.AdminHandler{AdminServices: service.AdminService}
 
-	admin := server.Group("/admin/v1")
+	admin := server.Group("v1/admin")
 	admin.Use(middlewares.RequireAuth)
 
 	admin.GET("/users", handler.GetAllUsers)

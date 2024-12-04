@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 var (
@@ -21,7 +22,12 @@ func recoverPanic() {
 func OpenLog() {
 	defer recoverPanic()
 
-	file, err := os.OpenFile(os.Getenv("FILE_PATH")+os.Getenv("FILE_NAME"), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := os.OpenFile(filepath.Join(filepath.Dir(wd), os.Getenv("FILE_NAME")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		panic(err)
 	}
