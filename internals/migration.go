@@ -3,14 +3,14 @@ package internals
 import (
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
+
+	"gorm.io/gorm"
 )
 
-func Migrate() {
-	db := GetDB()
-
+func Migrate(db *gorm.DB) {
 	err := db.AutoMigrate(&models.Users{}, &models.Categories{}, &models.Posts{}, &models.Comments{})
 	if err != nil {
-		loggers.ErrorLog.Fatalln(err)
+		loggers.Error.Fatalln(err)
 	}
-	loggers.InfoLog.Println("Migrated tables successfully...")
+	loggers.Info.Println("Migrated tables successfully...")
 }

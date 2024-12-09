@@ -10,7 +10,7 @@ type Users struct {
 	UserID    int            `json:"user_id,omitempty" gorm:"primarykey;autoIncrement"`
 	Email     string         `json:"email,omitempty" gorm:"unique;not null;"`
 	Username  string         `json:"username,omitempty" gorm:"unique;not null;"`
-	Password  string         `json:"password,omitempty" gorm:"not null;check:"`
+	Password  string         `json:"password,omitempty" gorm:"not null;"`
 	Role      string         `json:"role,omitempty" gorm:"check:role='admin' or role='user'"`
 	Comments  []Comments     `json:"comments,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Posts     []Posts        `json:"posts,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`

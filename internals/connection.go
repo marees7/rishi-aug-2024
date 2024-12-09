@@ -16,9 +16,9 @@ func Connect() {
 
 	client, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		loggers.ErrorLog.Fatalln(err)
+		loggers.Error.Fatalln(err)
 	}
-	loggers.InfoLog.Println("Connected to the server")
+	loggers.Info.Println("Connected to the server")
 
 	db = client
 }

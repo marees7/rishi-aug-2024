@@ -18,8 +18,6 @@ func init() {
 	loggers.OpenLog()
 	//connect to the database
 	internals.Connect()
-	//migrate the model structs
-	internals.Migrate()
 }
 
 func main() {
@@ -28,13 +26,15 @@ func main() {
 
 	//get the db connection
 	db := internals.GetDB()
+	//migrate the model structs
+	internals.Migrate(db)
 	//send the db connection to the repository package
-	authRepo := repositories.GetAuthRepository(db)
-	userRepo := repositories.GetUserRepository(db)
+	authRepository := repositories.GetAuthRepository(db)
+	userRepository := repositories.GetUserRepository(db)
 	//send the repo to the services package
-	authService := services.GetAuthService(authRepo)
-	adminService := services.GetAdminService(userRepo)
-	userService := services.GetUserService(userRepo)
+	authService := services.GetAuthService(authRepository)
+	adminService := services.GetAdminService(userRepository)
+	userService := services.GetUserService(userRepository)
 	//send the services to the handlers package
 	routes.AuthRoute(server, authService)
 	routes.UserRoute(server, userService)
@@ -42,6 +42,6 @@ func main() {
 
 	//start the server
 	if err := server.Start(os.Getenv("HTTP_PORT")); err != nil {
-		loggers.ErrorLog.Fatalln("Failed to start the server", err)
+		loggers.Error.Fatalln("Failed to start the server", err)
 	}
 }

@@ -9,7 +9,7 @@ import (
 
 type AdminServices interface {
 	GetUsers(users *[]models.Users, role string, limit, offset int) (int, error)
-	GetUserByUsername(users *models.Users, username string, role string) (int, error)
+	GetUser(users *models.Users, username string, role string) (int, error)
 	CreateCategory(category *models.Categories, role string) (int, error)
 	UpdateCategory(category *models.Categories, categoryid int, role string) (int, error)
 	DeleteCategory(category *models.Categories, categoryid int, role string) (int, error)
@@ -22,7 +22,7 @@ type adminService struct {
 // retrieve every users records
 func (repo *adminService) GetUsers(users *[]models.Users, role string, limit, offset int) (int, error) {
 	if role == "admin" {
-		if status, err := repo.User.RetrieveUsers(users, limit, offset); err != nil {
+		if status, err := repo.User.GetUsers(users, limit, offset); err != nil {
 			return status, err
 		}
 	} else {
@@ -32,9 +32,9 @@ func (repo *adminService) GetUsers(users *[]models.Users, role string, limit, of
 }
 
 // retrieve a single user records
-func (repo *adminService) GetUserByUsername(users *models.Users, username string, role string) (int, error) {
+func (repo *adminService) GetUser(users *models.Users, username string, role string) (int, error) {
 	if role == "admin" {
-		if status, err := repo.User.RetrieveSingleUser(users, username); err != nil {
+		if status, err := repo.User.GetUser(users, username); err != nil {
 			return status, err
 		}
 	} else {

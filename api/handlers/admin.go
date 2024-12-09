@@ -3,6 +3,7 @@ package handlers
 import (
 	"blogs/api/services"
 	"blogs/common/helpers"
+	"blogs/constants"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
 	"net/http"
@@ -16,17 +17,17 @@ type AdminHandler struct {
 }
 
 // retrieve every users records
-func (handler *AdminHandler) GetAllUsers(ctx echo.Context) error {
+func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
 	var users []models.Users
 	var limit, offset int
 
 	param := ctx.QueryParam("limit")
 	if param == "" {
-		limit = 100
+		limit = constants.Default_Limit
 	} else {
 		convLimit, err := strconv.Atoi(param)
 		if err != nil {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Error: err.Error(),
 			})
@@ -36,11 +37,11 @@ func (handler *AdminHandler) GetAllUsers(ctx echo.Context) error {
 
 	param = ctx.QueryParam("offset")
 	if param == "" {
-		offset = 0
+		offset = constants.Default_Offset
 	} else {
 		convOffset, err := strconv.Atoi(param)
 		if err != nil {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Error: err.Error(),
 			})
@@ -54,7 +55,7 @@ func (handler *AdminHandler) GetAllUsers(ctx echo.Context) error {
 	//call the get Users service
 	status, err := handler.AdminServices.GetUsers(&users, role, limit, offset)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -67,7 +68,7 @@ func (handler *AdminHandler) GetAllUsers(ctx echo.Context) error {
 }
 
 // retrieve a single user record
-func (handler *AdminHandler) GetSingleUser(ctx echo.Context) error {
+func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 	var user models.Users
 	username := ctx.Param("username")
 
@@ -75,9 +76,9 @@ func (handler *AdminHandler) GetSingleUser(ctx echo.Context) error {
 	role := getRole.(string)
 
 	//call the get User By ID service
-	status, err := handler.AdminServices.GetUserByUsername(&user, username, role)
+	status, err := handler.AdminServices.GetUser(&user, username, role)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -94,7 +95,7 @@ func (handler *AdminHandler) CreateCategory(ctx echo.Context) error {
 	var category models.Categories
 
 	if err := ctx.Bind(&category); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -106,7 +107,7 @@ func (handler *AdminHandler) CreateCategory(ctx echo.Context) error {
 	//call the create Category service
 	status, err := handler.AdminServices.CreateCategory(&category, role)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -125,14 +126,14 @@ func (handler *AdminHandler) UpdateCategory(ctx echo.Context) error {
 
 	categoryid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&category); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -143,7 +144,7 @@ func (handler *AdminHandler) UpdateCategory(ctx echo.Context) error {
 
 	//call the update category service
 	if status, err := handler.AdminServices.UpdateCategory(&category, categoryid, role); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -166,14 +167,14 @@ func (handler *AdminHandler) DeleteCategory(ctx echo.Context) error {
 
 	categoryid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&category); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -184,7 +185,7 @@ func (handler *AdminHandler) DeleteCategory(ctx echo.Context) error {
 
 	//call the delete category service
 	if status, err := handler.AdminServices.DeleteCategory(&category, categoryid, role); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})

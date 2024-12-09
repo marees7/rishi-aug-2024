@@ -8,9 +8,9 @@ type Services struct {
 	AdminService AdminServices
 }
 
-func GetAuthService(repo *repositories.Repository) *Services {
+func GetAuthService(repository *repositories.Repository) *Services {
 	return &Services{
-		AuthService: &authService{repo},
+		AuthService: &authService{repository},
 	}
 }
 

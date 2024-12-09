@@ -14,8 +14,8 @@ func AdminRoute(server *echo.Echo, service *services.Services) {
 	admin := server.Group("v1/admin")
 	admin.Use(middlewares.RequireAuth)
 
-	admin.GET("/users", handler.GetAllUsers)
-	admin.GET("/users/:username", handler.GetSingleUser)
+	admin.GET("/users", handler.GetUsers)
+	admin.GET("/users/:username", handler.GetUser)
 	admin.POST("/categories", handler.CreateCategory)
 	admin.PUT("/categories/:category_id", handler.UpdateCategory)
 	admin.DELETE("/categories/:category_id", handler.DeleteCategory)

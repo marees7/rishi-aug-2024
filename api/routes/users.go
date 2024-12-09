@@ -15,7 +15,7 @@ func UserRoute(server *echo.Echo, service *services.Services) {
 	users.Use(middlewares.RequireAuth)
 
 	users.GET("/", handler.GetUsers)
-	users.GET("/:username", handler.GetUserWithUsername)
+	users.GET("/:username", handler.GetUser)
 	users.GET("/categories", handler.Getcategories)
 	users.POST("/posts", handler.CreatePost)
 	users.GET("/posts", handler.GetPosts)

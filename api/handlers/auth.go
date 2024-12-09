@@ -21,7 +21,7 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 	var user models.Users
 
 	if err := ctx.Bind(&user); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -29,7 +29,7 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 
 	//check if the given info is valid
 	if err := validation.Validation(&user); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -37,7 +37,7 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 
 	//call the signup service
 	if err := handler.AuthServices.Signup(&user); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -54,21 +54,21 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	var login helpers.LoginRequest
 
 	if err := ctx.Bind(&login); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if login.Email == "" {
-		loggers.WarningLog.Println("email cannot be empty")
+		loggers.Warn.Println("email cannot be empty")
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
 			Error: "email cannot be empty",
 		})
 	}
 
 	if login.Password == "" {
-		loggers.WarningLog.Println("password cannot be empty")
+		loggers.Warn.Println("password cannot be empty")
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
 			Error: "password cannot be empty",
 		})
@@ -77,7 +77,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	//call the login service
 	user, err := handler.AuthServices.Login(&login)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -86,7 +86,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	//generate a new token
 	tokenstr, err := validation.GenerateToken(user)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
 			Error: err.Error(),
 		})

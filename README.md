@@ -60,7 +60,6 @@ The following endpoints are available in the API:
 | ---- | -------- | -------- |
 | GET  |	/v1/users/	| Get all users |
 | GET  |	/v1/users/:username	| Get a specific user |
-| GET  |	/v1/users/posts	| Get all blog posts |
 | POST |	/v1/users/posts	| Create a new blog post |
 | GET  |	/v1/users/posts	| Get all or specific blog post |
 | PUT  |	/v1/users/posts/:post_id	| Update a specific blog post |

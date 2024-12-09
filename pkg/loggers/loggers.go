@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	WarningLog *log.Logger
-	InfoLog    *log.Logger
-	ErrorLog   *log.Logger
+	Warn  *log.Logger
+	Info  *log.Logger
+	Error *log.Logger
 )
 
 func recoverPanic() {
@@ -32,7 +32,7 @@ func OpenLog() {
 		panic(err)
 	}
 
-	InfoLog = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-	WarningLog = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-	ErrorLog = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	Info = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	Warn = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
+	Error = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 }

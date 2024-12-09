@@ -19,7 +19,7 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		//retrieve the stored token and data from the cookie
 		tokenString, err := c.Cookie("Authorization")
 		if err != nil {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return c.JSON(http.StatusUnauthorized, helpers.ResponseJson{
 				Message: "You need to login first to use blog post",
 				Error:   err.Error(),
@@ -35,7 +35,7 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			return []byte(os.Getenv("SECRET_KEY")), nil
 		})
 		if err != nil {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return c.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Message: "invalid token",
 				Error:   err.Error(),
@@ -45,7 +45,7 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		//retrieve the data stored inside token
 		claims, err := validation.GetClaims(token)
 		if err != nil {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return c.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Message: "invalid token",
 				Error:   err.Error(),
@@ -58,7 +58,7 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 				Message: "Session expired,please login again to continue",
 			})
 		} else if claims["user_id"] == 0 {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return c.JSON(http.StatusNotFound, helpers.ResponseJson{
 				Message: "user not found",
 			})

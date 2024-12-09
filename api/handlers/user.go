@@ -3,6 +3,7 @@ package handlers
 import (
 	"blogs/api/services"
 	"blogs/common/helpers"
+	"blogs/constants"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
 	"net/http"
@@ -23,11 +24,11 @@ func (handler *UserHandler) GetUsers(ctx echo.Context) error {
 
 	param := ctx.QueryParam("limit")
 	if param == "" {
-		limit = 100
+		limit = constants.Default_Limit
 	} else {
 		convLimit, err := strconv.Atoi(param)
 		if err != nil {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Error: err.Error(),
 			})
@@ -37,11 +38,11 @@ func (handler *UserHandler) GetUsers(ctx echo.Context) error {
 
 	param = ctx.QueryParam("offset")
 	if param == "" {
-		offset = 0
+		offset = constants.Default_Offset
 	} else {
 		convOffset, err := strconv.Atoi(param)
 		if err != nil {
-			loggers.WarningLog.Println(err)
+			loggers.Warn.Println(err)
 			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 				Error: err.Error(),
 			})
@@ -52,7 +53,7 @@ func (handler *UserHandler) GetUsers(ctx echo.Context) error {
 	//call the get Users service
 	status, err := handler.UserServices.GetUsers(&users, limit, offset)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -78,15 +79,15 @@ func (handler *UserHandler) GetUsers(ctx echo.Context) error {
 }
 
 // retrieve single user public fields using username
-func (handler *UserHandler) GetUserWithUsername(ctx echo.Context) error {
+func (handler *UserHandler) GetUser(ctx echo.Context) error {
 	var user models.Users
 
 	username := ctx.Param("username")
 
 	//call the get User by id service
-	status, err := handler.UserServices.GetUserByID(&user, username)
+	status, err := handler.UserServices.GetUser(&user, username)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -110,7 +111,7 @@ func (handler *UserHandler) CreatePost(ctx echo.Context) error {
 	var post models.Posts
 
 	if err := ctx.Bind(&post); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -120,7 +121,7 @@ func (handler *UserHandler) CreatePost(ctx echo.Context) error {
 
 	//call the create post service
 	if status, err := handler.UserServices.CreatePost(&post, userid); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -139,14 +140,14 @@ func (handler *UserHandler) UpdatePost(ctx echo.Context) error {
 
 	postid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&post); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -159,7 +160,7 @@ func (handler *UserHandler) UpdatePost(ctx echo.Context) error {
 
 	//call the update post service
 	if status, err := handler.UserServices.UpdatePost(&post, userid, postid, role); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -182,14 +183,14 @@ func (handler *UserHandler) DeletePost(ctx echo.Context) error {
 
 	postid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&post); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -202,7 +203,7 @@ func (handler *UserHandler) DeletePost(ctx echo.Context) error {
 
 	//call the delete post service
 	if status, err := handler.UserServices.DeletePost(&post, userid, postid, role); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -222,21 +223,20 @@ func (handler *UserHandler) GetPosts(ctx echo.Context) error {
 
 	id := ctx.QueryParam("post_id")
 	postid, err := strconv.Atoi(id)
-	if err != nil {
-		if id == "" {
-			postid = 0
-		} else {
-			loggers.WarningLog.Println(err)
-			return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
-				Error: err.Error(),
-			})
-		}
+	if id == "" {
+		postid = 0
+	} else if err != nil {
+		loggers.Warn.Println(err)
+		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
+			Error: err.Error(),
+		})
+
 	}
 
 	//call the retrieve post service
-	status, err := handler.UserServices.RetrievePost(&posts, startDate, endDate, postid)
+	status, err := handler.UserServices.GetPost(&posts, startDate, endDate, postid)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -253,9 +253,9 @@ func (handler *UserHandler) Getcategories(ctx echo.Context) error {
 	var categories []models.Categories
 
 	//call the retrieve category service
-	status, err := handler.UserServices.RetrieveCategories(&categories)
+	status, err := handler.UserServices.GetCategories(&categories)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -271,14 +271,14 @@ func (handler *UserHandler) CreateComment(ctx echo.Context) error {
 
 	postid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&comment); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -288,7 +288,7 @@ func (handler *UserHandler) CreateComment(ctx echo.Context) error {
 
 	//call the create comment service
 	if status, err := handler.UserServices.CreateComment(&comment, userid, postid); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -307,14 +307,14 @@ func (handler *UserHandler) UpdateComment(ctx echo.Context) error {
 
 	commentid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&comment); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -327,7 +327,7 @@ func (handler *UserHandler) UpdateComment(ctx echo.Context) error {
 
 	//call the update comment service
 	if status, err := handler.UserServices.UpdateComment(&comment, userid, commentid, role); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -348,14 +348,14 @@ func (handler *UserHandler) DeleteComment(ctx echo.Context) error {
 
 	commentid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if err := ctx.Bind(&comment); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -368,7 +368,7 @@ func (handler *UserHandler) DeleteComment(ctx echo.Context) error {
 
 	//call the delete comment service
 	if status, err := handler.UserServices.DeleteComment(&comment, userid, commentid, role); err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})
@@ -387,16 +387,16 @@ func (handler *UserHandler) GetComments(ctx echo.Context) error {
 
 	postid, err := strconv.Atoi(id)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	//call the retrieve comment service
-	status, err := handler.UserServices.RetrieveComment(&comments, postid)
+	status, err := handler.UserServices.GetComment(&comments, postid)
 	if err != nil {
-		loggers.WarningLog.Println(err)
+		loggers.Warn.Println(err)
 		return ctx.JSON(status, helpers.ResponseJson{
 			Error: err.Error(),
 		})

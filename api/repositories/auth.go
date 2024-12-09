@@ -22,7 +22,7 @@ type authRepository struct {
 func (db *authRepository) RegisterUser(user *models.Users) error {
 	data := db.Create(&user)
 	if data.Error != nil {
-		loggers.WarningLog.Println(data.Error.Error())
+		loggers.Warn.Println(data.Error.Error())
 		return data.Error
 	}
 
@@ -35,10 +35,10 @@ func (db *authRepository) LoginUser(details *helpers.LoginRequest) (*models.User
 
 	data := db.Where("email=?", details.Email).First(&user)
 	if user.UserID == 0 {
-		loggers.WarningLog.Println("user not found")
+		loggers.Warn.Println("user not found")
 		return nil, fmt.Errorf("user not found")
 	} else if data.Error != nil {
-		loggers.WarningLog.Println(data.Error.Error())
+		loggers.Warn.Println(data.Error.Error())
 		return nil, data.Error
 	}
 
