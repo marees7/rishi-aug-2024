@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"blogs/api/validation"
-	"blogs/common/helpers"
+	"blogs/common/dto"
 	"blogs/pkg/loggers"
 	"fmt"
 	"net/http"
@@ -14,13 +14,13 @@ import (
 )
 
 // verify if the user/admin has an valid token
-func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
+func TokenValidation(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		//retrieve the stored token and data from the cookie
 		tokenString, err := c.Cookie("Authorization")
 		if err != nil {
 			loggers.Warn.Println(err)
-			return c.JSON(http.StatusUnauthorized, helpers.ResponseJson{
+			return c.JSON(http.StatusUnauthorized, dto.ResponseJson{
 				Message: "You need to login first to use blog post",
 				Error:   err.Error(),
 			})
@@ -36,7 +36,7 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		})
 		if err != nil {
 			loggers.Warn.Println(err)
-			return c.JSON(http.StatusBadRequest, helpers.ResponseJson{
+			return c.JSON(http.StatusUnauthorized, dto.ResponseJson{
 				Message: "invalid token",
 				Error:   err.Error(),
 			})
@@ -46,21 +46,16 @@ func RequireAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		claims, err := validation.GetClaims(token)
 		if err != nil {
 			loggers.Warn.Println(err)
-			return c.JSON(http.StatusBadRequest, helpers.ResponseJson{
+			return c.JSON(http.StatusUnauthorized, dto.ResponseJson{
 				Message: "invalid token",
 				Error:   err.Error(),
 			})
 		}
 
-		//check if the token has expired or the user is not found
+		//check if the token has expired
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			return c.JSON(http.StatusGatewayTimeout, helpers.ResponseJson{
+			return c.JSON(http.StatusUnauthorized, dto.ResponseJson{
 				Message: "Session expired,please login again to continue",
-			})
-		} else if claims["user_id"] == 0 {
-			loggers.Warn.Println(err)
-			return c.JSON(http.StatusNotFound, helpers.ResponseJson{
-				Message: "user not found",
 			})
 		}
 

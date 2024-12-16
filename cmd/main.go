@@ -1,9 +1,7 @@
 package main
 
 import (
-	"blogs/api/repositories"
 	"blogs/api/routes"
-	"blogs/api/services"
 	"blogs/internals"
 	"blogs/pkg/loggers"
 	"os"
@@ -16,29 +14,22 @@ func init() {
 	internals.LoadEnv()
 	//load the logger
 	loggers.OpenLog()
-	//connect to the database
-	internals.Connect()
 }
 
 func main() {
 	//create a instance of echo
 	server := echo.New()
 
-	//get the db connection
-	db := internals.GetDB()
+	//connect to the database and get the db
+	db := internals.Connect()
 	//migrate the model structs
-	internals.Migrate(db)
-	//send the db connection to the repository package
-	authRepository := repositories.GetAuthRepository(db)
-	userRepository := repositories.GetUserRepository(db)
-	//send the repo to the services package
-	authService := services.GetAuthService(authRepository)
-	adminService := services.GetAdminService(userRepository)
-	userService := services.GetUserService(userRepository)
+	db.Migrate()
 	//send the services to the handlers package
-	routes.AuthRoute(server, authService)
-	routes.UserRoute(server, userService)
-	routes.AdminRoute(server, adminService)
+	routes.AuthRoute(server, db.DB)
+	routes.CategoryRoute(server, db.DB)
+	routes.AdminRoute(server, db.DB)
+	routes.CommentRoute(server, db.DB)
+	routes.PostRoute(server, db.DB)
 
 	//start the server
 	if err := server.Start(os.Getenv("HTTP_PORT")); err != nil {

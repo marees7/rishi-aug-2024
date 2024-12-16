@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"blogs/common/helpers"
+	"blogs/common/dto"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
 	"fmt"
@@ -12,9 +12,9 @@ import (
 )
 
 // generate a new token for the user
-func GenerateToken(user *models.Users) (string, error) {
+func GenerateToken(user *models.User) (string, error) {
 	//set claims with needed data and expire time if needed
-	claims := &helpers.JWTClaims{
+	claims := &dto.JWTClaims{
 		Userid:   user.UserID,
 		Username: user.Username,
 		Email:    user.Email,

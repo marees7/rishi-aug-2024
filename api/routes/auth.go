@@ -2,13 +2,20 @@ package routes
 
 import (
 	"blogs/api/handlers"
+	"blogs/api/repositories"
 	"blogs/api/services"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
-func AuthRoute(server *echo.Echo, service *services.Services) {
-	handler := &handlers.AuthHandler{AuthServices: service.AuthService}
+func AuthRoute(server *echo.Echo, db *gorm.DB) {
+	//send the db connection to the repository package
+	authRepository := repositories.InitAuthRepository(db)
+	//send the repo to the services package
+	authService := services.InitAuthService(authRepository)
+
+	handler := &handlers.AuthHandler{AuthServices: authService}
 
 	server.POST("/signup", handler.Signup)
 	server.POST("/login", handler.Login)

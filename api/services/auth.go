@@ -1,39 +1,43 @@
 package services
 
 import (
-	"blogs/common/helpers"
-	"blogs/pkg/models"
 	"blogs/api/repositories"
+	"blogs/common/dto"
+	"blogs/pkg/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthServices interface {
-	Signup(user *models.Users) error
-	Login(login *helpers.LoginRequest) (*models.Users, error)
+	Signup(user *models.User) error
+	Login(login *dto.LoginRequest) (*models.User, error)
 }
 
 type authService struct {
-	*repositories.Repository
+	repositories.AuthRepository
 }
 
-//hashes the password and sends it to the db
-func (repo *authService) Signup(user *models.Users) error {
+func InitAuthService(repository repositories.AuthRepository) AuthServices {
+	return &authService{repository}
+}
+
+// hashes the password and sends it to the db
+func (repo *authService) Signup(user *models.User) error {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
 		return err
 	}
 	user.Password = string(hashedPass)
 
-	if err := repo.Auth.RegisterUser(user); err != nil {
+	if err := repo.AuthRepository.Signup(user); err != nil {
 		return err
 	}
 	return nil
 }
 
-//compares the hashed password lets the user login
-func (repo *authService) Login(login *helpers.LoginRequest) (*models.Users, error) {
-	user, err := repo.Auth.LoginUser(login)
+// compares the hashed password lets the user login
+func (repo *authService) Login(login *dto.LoginRequest) (*models.User, error) {
+	user, err := repo.AuthRepository.Login(login)
 	if err != nil {
 		return nil, err
 	}

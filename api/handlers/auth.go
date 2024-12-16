@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"blogs/api/services"
-	"blogs/common/helpers"
+	"blogs/common/dto"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
 
@@ -18,19 +18,19 @@ type AuthHandler struct {
 
 // register an new user
 func (handler *AuthHandler) Signup(ctx echo.Context) error {
-	var user models.Users
+	var user models.User
 
 	if err := ctx.Bind(&user); err != nil {
 		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	//check if the given info is valid
-	if err := validation.Validation(&user); err != nil {
+	if err := validation.UserValidation(&user); err != nil {
 		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
@@ -38,12 +38,12 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 	//call the signup service
 	if err := handler.AuthServices.Signup(&user); err != nil {
 		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
+		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
-	return ctx.JSON(http.StatusOK, helpers.ResponseJson{
+	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "User created successfully",
 		Data:    user.Email,
 	})
@@ -51,25 +51,25 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 
 // validate and sign-in a user
 func (handler *AuthHandler) Login(ctx echo.Context) error {
-	var login helpers.LoginRequest
+	var login dto.LoginRequest
 
 	if err := ctx.Bind(&login); err != nil {
 		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusBadRequest, helpers.ResponseJson{
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
 	if login.Email == "" {
 		loggers.Warn.Println("email cannot be empty")
-		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: "email cannot be empty",
 		})
 	}
 
 	if login.Password == "" {
 		loggers.Warn.Println("password cannot be empty")
-		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: "password cannot be empty",
 		})
 	}
@@ -78,7 +78,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	user, err := handler.AuthServices.Login(&login)
 	if err != nil {
 		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
+		return ctx.JSON(http.StatusUnauthorized, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
@@ -87,7 +87,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	tokenstr, err := validation.GenerateToken(user)
 	if err != nil {
 		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, helpers.ResponseJson{
+		return ctx.JSON(http.StatusUnauthorized, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
@@ -101,7 +101,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 		HttpOnly: true,
 	})
 
-	return ctx.JSON(http.StatusOK, helpers.ResponseJson{
+	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Logged in successfully",
 	})
 }

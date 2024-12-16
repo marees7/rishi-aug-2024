@@ -1,0 +1,126 @@
+INFO: 2024/12/13 20:10:01 connection.go:23: Connected to the server
+INFO: 2024/12/13 20:10:01 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/13 20:20:49 connection.go:23: Connected to the server
+INFO: 2024/12/13 20:20:49 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 11:04:53 connection.go:23: Connected to the server
+INFO: 2024/12/16 11:04:53 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 11:08:46 auth.go:80: crypto/bcrypt: hashedPassword is not the hash of the given password
+WARNING: 2024/12/16 11:09:35 admin.go:163: record not found
+INFO: 2024/12/16 11:12:01 connection.go:23: Connected to the server
+INFO: 2024/12/16 11:12:01 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 11:12:45 connection.go:23: Connected to the server
+INFO: 2024/12/16 11:12:45 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 11:17:06 connection.go:23: Connected to the server
+INFO: 2024/12/16 11:17:06 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 11:17:20 post.go:22: code=400, message=Unmarshal type error: expected=string, got=number, field=category_id, offset=169, internal=json: cannot unmarshal number into Go struct field Posts.category_id of type string
+WARNING: 2024/12/16 11:17:53 post.go:32: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+WARNING: 2024/12/16 11:18:15 post.go:32: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+WARNING: 2024/12/16 11:19:22 post.go:32: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+WARNING: 2024/12/16 11:20:31 admin.go:108: ERROR: duplicate key value violates unique constraint "uni_categories_category_name" (SQLSTATE 23505)
+WARNING: 2024/12/16 11:20:52 post.go:22: code=400, message=Syntax error: offset=214, error=invalid character '}' looking for beginning of object key string, internal=invalid character '}' looking for beginning of object key string
+WARNING: 2024/12/16 11:20:57 post.go:32: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+INFO: 2024/12/16 11:50:23 connection.go:23: Connected to the server
+INFO: 2024/12/16 11:50:23 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 11:50:35 auth.go:42: user not found
+WARNING: 2024/12/16 11:50:35 auth.go:80: user not found
+INFO: 2024/12/16 11:54:43 connection.go:23: Connected to the server
+INFO: 2024/12/16 11:54:43 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 11:54:58 post.go:41: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+WARNING: 2024/12/16 11:55:25 post.go:41: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+INFO: 2024/12/16 12:01:11 connection.go:23: Connected to the server
+ERROR: 2024/12/16 12:01:11 migration.go:11: invalid field found for struct blogs/pkg/models.Users's field Comments: define a valid foreign key for relations or implement the Valuer/Scanner interface
+INFO: 2024/12/16 12:02:46 connection.go:23: Connected to the server
+ERROR: 2024/12/16 12:02:46 migration.go:11: invalid field found for struct blogs/pkg/models.Users's field Comments: define a valid foreign key for relations or implement the Valuer/Scanner interface
+INFO: 2024/12/16 12:21:00 connection.go:23: Connected to the server
+ERROR: 2024/12/16 12:21:00 migration.go:11: invalid field found for struct blogs/pkg/models.Users's field Comments: define a valid foreign key for relations or implement the Valuer/Scanner interface
+INFO: 2024/12/16 12:22:35 connection.go:23: Connected to the server
+ERROR: 2024/12/16 12:22:35 migration.go:11: invalid field found for struct blogs/pkg/models.Users's field Comments: define a valid foreign key for relations or implement the Valuer/Scanner interface
+INFO: 2024/12/16 12:23:58 connection.go:23: Connected to the server
+INFO: 2024/12/16 12:23:58 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 12:25:00 post.go:41: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+WARNING: 2024/12/16 12:25:40 post.go:41: ERROR: insert or update on table "posts" violates foreign key constraint "fk_users_posts" (SQLSTATE 23503)
+INFO: 2024/12/16 12:31:23 connection.go:23: Connected to the server
+INFO: 2024/12/16 12:31:23 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 12:38:48 connection.go:23: Connected to the server
+INFO: 2024/12/16 12:38:48 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 12:39:43 post.go:112: invalid UUID length: 42
+WARNING: 2024/12/16 12:39:48 post.go:112: invalid UUID length: 42
+WARNING: 2024/12/16 12:40:15 post.go:71: cannot delete other users post
+WARNING: 2024/12/16 12:40:15 post.go:135: cannot delete other users post
+INFO: 2024/12/16 12:49:09 connection.go:23: Connected to the server
+INFO: 2024/12/16 12:49:09 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 13:05:12 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:05:13 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:05:51 post.go:156: invalid UUID length: 0
+WARNING: 2024/12/16 13:06:08 post.go:156: invalid UUID length: 0
+WARNING: 2024/12/16 13:06:25 post.go:156: invalid UUID length: 0
+INFO: 2024/12/16 13:06:55 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:06:55 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:07:20 post.go:156: invalid UUID length: 0
+INFO: 2024/12/16 13:10:08 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:10:08 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:10:12 post.go:156: invalid UUID length: 0
+WARNING: 2024/12/16 13:10:14 post.go:156: invalid UUID length: 0
+INFO: 2024/12/16 13:10:32 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:10:32 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:10:35 post.go:156: invalid UUID length: 0
+INFO: 2024/12/16 13:13:36 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:13:36 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 13:24:18 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:24:18 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:24:52 auth.go:32: Key: 'Users.Email' Error:Field validation for 'Email' failed on the 'email' tag
+WARNING: 2024/12/16 13:25:01 auth.go:32: Key: 'Users.Email' Error:Field validation for 'Email' failed on the 'email' tag
+INFO: 2024/12/16 13:30:04 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:30:04 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:30:13 auth.go:32: role must be either admin or user
+INFO: 2024/12/16 13:46:16 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:46:16 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 13:54:09 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:54:09 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:54:17 post.go:31: title cannot be empty
+WARNING: 2024/12/16 13:54:24 post.go:31: content cannot be empty
+WARNING: 2024/12/16 13:54:30 post.go:31: descroption cannot be empty
+WARNING: 2024/12/16 13:54:41 post.go:83: title cannot be empty
+INFO: 2024/12/16 13:58:12 connection.go:23: Connected to the server
+INFO: 2024/12/16 13:58:12 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 13:58:20 post.go:46: cannot update other users post
+WARNING: 2024/12/16 13:58:20 post.go:100: cannot update other users post
+INFO: 2024/12/16 15:39:46 connection.go:23: Connected to the server
+INFO: 2024/12/16 15:39:46 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 15:55:24 connection.go:23: Connected to the server
+INFO: 2024/12/16 15:55:24 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 15:57:02 token_validation.go:22: http: named cookie not present
+INFO: 2024/12/16 16:00:04 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:00:05 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 16:01:13 comment.go:171: invalid UUID length: 0
+INFO: 2024/12/16 16:02:58 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:02:58 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 16:03:03 comment.go:184: record not found
+INFO: 2024/12/16 16:05:11 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:05:11 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 16:05:16 comment.go:50: ERROR: op ANY/ALL (array) requires array on right side (SQLSTATE 42809)
+WARNING: 2024/12/16 16:05:16 comment.go:184: ERROR: op ANY/ALL (array) requires array on right side (SQLSTATE 42809)
+INFO: 2024/12/16 16:13:15 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:13:15 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 16:21:59 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:21:59 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 16:22:04 comment.go:50: ERROR: syntax error at or near "%" (SQLSTATE 42601)
+WARNING: 2024/12/16 16:22:04 comment.go:184: ERROR: syntax error at or near "%" (SQLSTATE 42601)
+INFO: 2024/12/16 16:23:32 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:23:32 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 16:23:35 comment.go:50: ERROR: syntax error at or near "%" (SQLSTATE 42601)
+WARNING: 2024/12/16 16:23:35 comment.go:184: ERROR: syntax error at or near "%" (SQLSTATE 42601)
+INFO: 2024/12/16 16:24:57 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:24:57 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 16:25:29 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:25:30 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 16:25:54 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:25:54 migration.go:13: Migrated tables successfully...
+INFO: 2024/12/16 16:27:28 connection.go:23: Connected to the server
+INFO: 2024/12/16 16:27:28 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 16:27:41 token_validation.go:22: http: named cookie not present
+WARNING: 2024/12/16 16:27:47 token_validation.go:22: http: named cookie not present
+INFO: 2024/12/16 17:47:48 connection.go:23: Connected to the server
+INFO: 2024/12/16 17:47:48 migration.go:13: Migrated tables successfully...
+WARNING: 2024/12/16 17:54:40 comment.go:184: record not found
+WARNING: 2024/12/16 17:54:46 comment.go:184: record not found

@@ -9,9 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+type connection struct {
+	*gorm.DB
+}
 
-func Connect() {
+func Connect() *connection {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"))
 
 	client, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -20,9 +22,5 @@ func Connect() {
 	}
 	loggers.Info.Println("Connected to the server")
 
-	db = client
-}
-
-func GetDB() *gorm.DB {
-	return db
+	return &connection{client}
 }
