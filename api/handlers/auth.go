@@ -28,7 +28,7 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 	}
 
 	//check if the given info is valid
-	if err := validation.UserValidation(&user); err != nil {
+	if err := validation.ValidateUser(&user); err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
@@ -43,7 +43,7 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 		})
 	}
 
-	return ctx.JSON(http.StatusOK, dto.ResponseJson{
+	return ctx.JSON(http.StatusCreated, dto.ResponseJson{
 		Message: "User created successfully",
 		Data:    user.Email,
 	})
@@ -75,11 +75,11 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	}
 
 	//call the login service
-	user, err := handler.AuthServices.Login(&login)
-	if err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusUnauthorized, dto.ResponseJson{
-			Error: err.Error(),
+	user, errs := handler.AuthServices.Login(&login)
+	if errs != nil {
+		loggers.Warn.Println(errs.Error)
+		return ctx.JSON(errs.Status, dto.ResponseJson{
+			Error: errs.Error,
 		})
 	}
 

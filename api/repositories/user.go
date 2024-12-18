@@ -8,7 +8,7 @@ import (
 
 type UserRepository interface {
 	GetUsers(limit int, offset int) (*[]models.User, error)
-	GetUser(usernaem string) (*models.User, error)
+	GetUser(username string) (*models.User, error)
 }
 
 type userRepository struct {

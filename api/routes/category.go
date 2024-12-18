@@ -18,19 +18,17 @@ func CategoryRoute(server *echo.Echo, db *gorm.DB) {
 	userService := services.InitCategoryService(categoryRepository)
 
 	//Initialize the handler struct
-	handler := &handlers.CategoryHandler{
-		Category: userService,
-	}
+	handler := &handlers.CategoryHandler{Category: userService}
 
 	//group user routes
 	users := server.Group("v1/users")
-	users.Use(middlewares.TokenValidation)
+	users.Use(middlewares.ValidateToken)
 
 	users.GET("/categories", handler.Getcategories)
 
 	//group admin routes
 	admin := server.Group("v1/admin")
-	admin.Use(middlewares.TokenValidation)
+	admin.Use(middlewares.ValidateToken)
 
 	admin.POST("/categories", handler.CreateCategory)
 	admin.PUT("/categories/:category_id", handler.UpdateCategory)

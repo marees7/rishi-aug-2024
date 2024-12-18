@@ -15,7 +15,7 @@ import (
 func GenerateToken(user *models.User) (string, error) {
 	//set claims with needed data and expire time if needed
 	claims := &dto.JWTClaims{
-		Userid:   user.UserID,
+		UserID:   user.UserID,
 		Username: user.Username,
 		Email:    user.Email,
 		Role:     user.Role,

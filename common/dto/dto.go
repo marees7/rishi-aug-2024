@@ -11,13 +11,18 @@ type ResponseJson struct {
 	Error   string      `json:"error,omitempty"`
 }
 
+type ErrorResponse struct {
+	Error  string `json:"error"`
+	Status int    `json:"status"`
+}
+
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type JWTClaims struct {
-	Userid   uuid.UUID `json:"user_id"`
+	UserID   uuid.UUID `json:"user_id"`
 	Username string    `json:"username"`
 	Email    string    `json:"email"`
 	Role     string    `json:"role"`

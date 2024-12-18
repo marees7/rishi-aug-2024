@@ -6,8 +6,8 @@ import (
 )
 
 type AdminServices interface {
-	GetUsers(role string, limit, offset int) (*[]models.User, error)
-	GetUser(username string, role string) (*models.User, error)
+	GetUsers(limit, page int) (*[]models.User, error)
+	GetUser(username string) (*models.User, error)
 }
 
 type adminService struct {
@@ -19,19 +19,13 @@ func InitAdminService(user repositories.UserRepository) AdminServices {
 }
 
 // retrieve every users records
-func (repo *adminService) GetUsers(role string, limit, offset int) (*[]models.User, error) {
-	users, err := repo.Users.GetUsers(limit, offset)
-	if err != nil {
-		return nil, err
-	}
-	return users, nil
+func (repo *adminService) GetUsers(limit, page int) (*[]models.User, error) {
+	offset := (page - 1) * limit
+	
+	return repo.Users.GetUsers(limit, offset)
 }
 
 // retrieve a single user records
-func (repo *adminService) GetUser(username string, role string) (*models.User, error) {
-	users, err := repo.Users.GetUser(username)
-	if err != nil {
-		return nil, err
-	}
-	return users, nil
+func (repo *adminService) GetUser(username string) (*models.User, error) {
+	return repo.Users.GetUser(username)
 }

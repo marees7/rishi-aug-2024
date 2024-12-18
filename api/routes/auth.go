@@ -12,9 +12,11 @@ import (
 func AuthRoute(server *echo.Echo, db *gorm.DB) {
 	//send the db connection to the repository package
 	authRepository := repositories.InitAuthRepository(db)
+
 	//send the repo to the services package
 	authService := services.InitAuthService(authRepository)
 
+	//Initialize the handler struct
 	handler := &handlers.AuthHandler{AuthServices: authService}
 
 	server.POST("/signup", handler.Signup)

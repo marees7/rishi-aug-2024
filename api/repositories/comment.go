@@ -1,19 +1,22 @@
 package repositories
 
 import (
+	"blogs/api/validation"
+	"blogs/common/constants"
+	"blogs/common/dto"
 	"blogs/pkg/models"
 	"errors"
-	"fmt"
+	"net/http"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type CommentRepository interface {
-	CreateComment(comment *models.Comment) error
-	UpdateComment(comment *models.Comment, commentid uuid.UUID, role string) error
-	GetComment(postid uuid.UUID, content string) (*[]models.Comment, error)
-	DeleteComment(userid uuid.UUID, commentid uuid.UUID, role string) (*models.Comment, error)
+	CreateComment(comment *models.Comment) *dto.ErrorResponse
+	GetComments(postID uuid.UUID, commentMap map[string]interface{}) (*[]models.Comment, *dto.ErrorResponse)
+	UpdateComment(comment *models.Comment, commentid uuid.UUID) *dto.ErrorResponse
+	DeleteComment(userID uuid.UUID, commentid uuid.UUID, role string) (*models.Comment, *dto.ErrorResponse)
 }
 
 type commentRepository struct {
@@ -25,99 +28,112 @@ func InitCommentRepository(db *gorm.DB) CommentRepository {
 }
 
 // create a new comment
-func (db *commentRepository) CreateComment(comment *models.Comment) error {
-	data := db.Create(&comment)
+func (db *commentRepository) CreateComment(comment *models.Comment) *dto.ErrorResponse {
+	//check if the post exists
+	data := db.Where("post_id=?", comment.PostID).First(&models.Post{})
+	if errors.Is(data.Error, gorm.ErrRecordNotFound) {
+		return &dto.ErrorResponse{Status: http.StatusNotFound, Error: "post does not exist"}
+	} else if data.Error != nil {
+		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
+	}
+
+	//create the comment
+	data = db.Create(&comment)
 	if data.Error != nil {
-		return data.Error
+		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
 	return nil
 }
 
 // retrieve comments using post id
-func (db *commentRepository) GetComment(postid uuid.UUID, content string) (*[]models.Comment, error) {
-	var checkComment models.Comment
+func (db *commentRepository) GetComments(postID uuid.UUID, commentMap map[string]interface{}) (*[]models.Comment, *dto.ErrorResponse) {
 	var comment []models.Comment
+	search := commentMap["search"].(string)
+	limit := commentMap["limit"].(int)
+	offset := commentMap["offset"].(int)
 
 	//retrieves the comment
-	if content != "" && postid == uuid.Nil {
-		//get the comments using content
-		data := db.Where("content LIKE '%' || ? || '%'", content).Find(&comment)
-		if errors.Is(data.Error, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("user not found")
-		} else if data.Error != nil {
-			return nil, data.Error
-		}
-		return &comment, nil
-	} else if postid != uuid.Nil && content == "" {
+	if search != "" {
 		//check if the post exists
-		data := db.Where("post_id=?", postid).First(&checkComment)
-		if data.Error != nil {
-			return nil, data.Error
-		} else if checkComment.PostID != postid {
-			return nil, fmt.Errorf("post id not found")
+		data := db.Where("post_id=?", postID).First(&models.Post{})
+		if errors.Is(data.Error, gorm.ErrRecordNotFound) {
+			return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "post not found"}
+		} else if data.Error != nil {
+			return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 		}
 
-		//get the comments using postid
-		data = db.Where("post_id=?", postid).Find(&comment)
+		//get the comments using content
+		data = db.Where("content LIKE '%' || ? || '%'", search).Limit(limit).Offset(offset).Find(&comment)
 		if errors.Is(data.Error, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("user not found")
+			return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "comment not found"}
 		} else if data.Error != nil {
-			return nil, data.Error
+			return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 		}
 		return &comment, nil
 	} else {
-		data := db.Find(&comment)
+		//check if the post exists
+		data := db.Where("post_id=?", postID).First(&models.Post{})
+		if errors.Is(data.Error, gorm.ErrRecordNotFound) {
+			return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "post not found"}
+		} else if data.Error != nil {
+			return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
+		}
+
+		//get the comments using postid
+		data = db.Where("post_id=?", postID).Limit(limit).Offset(offset).Find(&comment)
 		if data.Error != nil {
-			return nil, data.Error
+			return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 		}
 		return &comment, nil
 	}
 }
 
 // updates the existing comment
-func (db *commentRepository) UpdateComment(comment *models.Comment, commentid uuid.UUID, role string) error {
-	var checkComment models.Comment
+func (db *commentRepository) UpdateComment(comment *models.Comment, commentid uuid.UUID) *dto.ErrorResponse {
+	var commentData models.Comment
 
 	//check if the record exists and if the user can access it
-	data := db.Where("comment_id=?", commentid).First(&checkComment)
+	data := db.Where("comment_id=?", commentid).First(&commentData)
 	if data.Error != nil {
-		return data.Error
-	} else if checkComment.UserID != comment.UserID && role != "admin" {
-		return fmt.Errorf("cannot update other users comment")
+		return &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
+	} else if commentData.UserID != comment.UserID {
+		return &dto.ErrorResponse{Status: http.StatusUnauthorized, Error: "cannot update other users comment"}
 	}
 
-	//updates the comment if the user created it or if it is the admin
-	if checkComment.UserID == comment.UserID || role == "admin" {
+	//updates the comment if the user created it
+	if commentData.UserID == comment.UserID {
 		data = db.Where("comment_id=?", commentid).Updates(&comment)
 		if data.Error != nil {
-			return data.Error
+			return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 		} else if data.RowsAffected == 0 {
-			return fmt.Errorf("no rows affected")
+			return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 		}
 	}
+	comment.CommentID = commentData.CommentID
+
 	return nil
 }
 
 // deletes the existing comment
-func (db *commentRepository) DeleteComment(userid uuid.UUID, commentid uuid.UUID, role string) (*models.Comment, error) {
-	var checkComment models.Comment
+func (db *commentRepository) DeleteComment(userID uuid.UUID, commentid uuid.UUID, role string) (*models.Comment, *dto.ErrorResponse) {
+	var commentData models.Comment
 
 	//check if the record exists and if the user can access it
-	data := db.Where("comment_id=?", commentid).First(&checkComment)
+	data := db.Where("comment_id=?", commentid).First(&commentData)
 	if data.Error != nil {
-		return nil, data.Error
-	} else if checkComment.UserID != userid && role != "admin" {
-		return nil, fmt.Errorf("cannot delete other users comment")
+		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
+	} else if commentData.UserID != userID && role != constants.AdminRole {
+		return nil, &dto.ErrorResponse{Status: http.StatusUnauthorized, Error: "cannot delete other users comment"}
 	}
 
 	//deletes the record if the user created it or if it is the admin
-	if checkComment.UserID == userid || role == "admin" {
-		data = db.Where("comment_id=?", commentid).Delete(&checkComment)
+	if commentData.UserID == userID || validation.CheckRole(role) {
+		data = db.Where("comment_id=?", commentid).Delete(&commentData)
 		if data.Error != nil {
-			return nil, data.Error
+			return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 		} else if data.RowsAffected == 0 {
-			return nil, fmt.Errorf("no rows affected")
+			return nil, &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 		}
 	}
-	return &checkComment, nil
+	return &commentData, nil
 }

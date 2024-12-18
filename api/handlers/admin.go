@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"blogs/api/services"
+	"blogs/api/validation"
 	"blogs/common/constants"
 	"blogs/common/dto"
 	"blogs/pkg/loggers"
@@ -17,72 +18,72 @@ type AdminHandler struct {
 
 // retrieve every users records
 func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
-	var limit, offset int
-
-	limit_param := ctx.QueryParam("limit")
-	if limit_param == "" {
-		limit = constants.Default_Limit
-	} else {
-		convLimit, err := strconv.Atoi(limit_param)
-		if err != nil {
-			loggers.Warn.Println(err)
-			return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
-				Error: err.Error(),
-			})
-		}
-		limit = convLimit
-	}
-
-	offset_param := ctx.QueryParam("offset")
-	if offset_param == "" {
-		offset = constants.Default_Offset
-	} else {
-		convOffset, err := strconv.Atoi(offset_param)
-		if err != nil {
-			loggers.Warn.Println(err)
-			return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
-				Error: err.Error(),
-			})
-		}
-		offset = convOffset
-	}
-
-	getRole := (ctx.Get("role"))
-	role := getRole.(string)
-
-	//call the get Users service
-	users, err := handler.AdminServices.GetUsers(role, limit, offset)
-	if err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
+	pages := ctx.QueryParam("offset")
+	page, err := strconv.Atoi(pages)
+	if pages == "" {
+		page = constants.DefaultOffset
+	} else if err != nil {
+		loggers.Warn.Println(err.Error())
+		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
-	return ctx.JSON(http.StatusOK, dto.ResponseJson{
-		Message: "Users retreived successfully",
-		Data:    users,
-	})
+	pageSize := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(pageSize)
+	if pageSize == "" {
+		limit = constants.DefaultLimit
+	} else if err != nil {
+		loggers.Warn.Println(err.Error())
+		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
+			Error: err.Error(),
+		})
+	}
+
+	roleCtx := ctx.Get("role").(string)
+
+	if validation.CheckRole(roleCtx) {
+		//call the get Users service
+		users, err := handler.AdminServices.GetUsers(limit, page)
+		if err != nil {
+			loggers.Warn.Println(err)
+			return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
+				Error: err.Error(),
+			})
+		}
+		return ctx.JSON(http.StatusOK, dto.ResponseJson{
+			Message: "Users retreived successfully",
+			Data:    users,
+		})
+	} else {
+		return ctx.JSON(http.StatusForbidden, dto.ResponseJson{
+			Message: "Only admins are allowed",
+		})
+	}
 }
 
 // retrieve a single user record
 func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 	username := ctx.Param("username")
 
-	getRole := (ctx.Get("role"))
-	role := getRole.(string)
+	roleCtx := ctx.Get("role").(string)
 
-	//call the get User By ID service
-	user, err := handler.AdminServices.GetUser(username, role)
-	if err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-			Error: err.Error(),
+	if validation.CheckRole(roleCtx) {
+		//call the get User By ID service
+		users, err := handler.AdminServices.GetUser(username)
+		if err != nil {
+			loggers.Warn.Println(err)
+			return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
+				Error: err.Error(),
+			})
+		}
+		return ctx.JSON(http.StatusOK, dto.ResponseJson{
+			Message: "Users retreived successfully",
+			Data:    users,
+		})
+	} else {
+		return ctx.JSON(http.StatusForbidden, dto.ResponseJson{
+			Message: "Only admins are allowed",
 		})
 	}
-
-	return ctx.JSON(http.StatusOK, dto.ResponseJson{
-		Message: "User retreived successfully",
-		Data:    user,
-	})
 }

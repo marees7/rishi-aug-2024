@@ -14,7 +14,7 @@ import (
 )
 
 // verify if the user/admin has an valid token
-func TokenValidation(next echo.HandlerFunc) echo.HandlerFunc {
+func ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		//retrieve the stored token and data from the cookie
 		tokenString, err := c.Cookie("Authorization")

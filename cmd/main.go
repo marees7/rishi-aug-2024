@@ -12,6 +12,7 @@ import (
 func init() {
 	//load the env file
 	internals.LoadEnv()
+	
 	//load the logger
 	loggers.OpenLog()
 }
@@ -22,8 +23,10 @@ func main() {
 
 	//connect to the database and get the db
 	db := internals.Connect()
+
 	//migrate the model structs
 	db.Migrate()
+
 	//send the services to the handlers package
 	routes.AuthRoute(server, db.DB)
 	routes.CategoryRoute(server, db.DB)

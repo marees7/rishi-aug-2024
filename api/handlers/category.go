@@ -3,10 +3,12 @@ package handlers
 import (
 	"blogs/api/services"
 	"blogs/api/validation"
+	"blogs/common/constants"
 	"blogs/common/dto"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -18,12 +20,34 @@ type CategoryHandler struct {
 
 // retrieve every categories available
 func (handler *CategoryHandler) Getcategories(ctx echo.Context) error {
-	//call the retrieve category service
-	categories, err := handler.Category.GetCategories()
-	if err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
+	//pagination
+	pages := ctx.QueryParam("offset")
+	page, err := strconv.Atoi(pages)
+	if pages == "" {
+		page = constants.DefaultOffset
+	} else if err != nil {
+		loggers.Warn.Println(err.Error())
+		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
 			Error: err.Error(),
+		})
+	}
+
+	pageSize := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(pageSize)
+	if pageSize == "" {
+		limit = constants.DefaultLimit
+	} else if err != nil {
+		loggers.Warn.Println(err.Error())
+		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
+			Error: err.Error(),
+		})
+	}
+	//call the retrieve category service
+	categories, errs := handler.Category.GetCategories(limit, page)
+	if errs != nil {
+		loggers.Warn.Println(errs.Error)
+		return ctx.JSON(errs.Status, dto.ResponseJson{
+			Error: errs.Error,
 		})
 	}
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
@@ -43,17 +67,16 @@ func (handler *CategoryHandler) CreateCategory(ctx echo.Context) error {
 		})
 	}
 
-	if err := validation.CategoryValidation(&category); err != nil {
+	if err := validation.ValidateCategory(&category); err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
-	getRole := (ctx.Get("role"))
-	role := getRole.(string)
+	roleCtx := ctx.Get("role").(string)
 
-	if role == "admin" {
+	if validation.CheckRole(roleCtx) {
 		//call the create Category service
 		err := handler.Category.CreateCategory(&category)
 		if err != nil {
@@ -63,12 +86,12 @@ func (handler *CategoryHandler) CreateCategory(ctx echo.Context) error {
 			})
 		}
 	} else {
-		return ctx.JSON(http.StatusUnauthorized, dto.ResponseJson{
+		return ctx.JSON(http.StatusForbidden, dto.ResponseJson{
 			Message: "Only admins are allowed",
 		})
 	}
 
-	return ctx.JSON(http.StatusOK, dto.ResponseJson{
+	return ctx.JSON(http.StatusCreated, dto.ResponseJson{
 		Message: "Category created successfully",
 		Data:    category,
 	})
@@ -93,27 +116,18 @@ func (handler *CategoryHandler) UpdateCategory(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
+	roleCtx := ctx.Get("role").(string)
 
-	if err := validation.CategoryValidation(&category); err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
-			Error: err.Error(),
-		})
-	}
-
-	getRole := (ctx.Get("role"))
-	role := getRole.(string)
-
-	if role == "admin" {
+	if validation.CheckRole(roleCtx) {
 		//call the update category service
 		if err := handler.Category.UpdateCategory(&category, categoryid); err != nil {
-			loggers.Warn.Println(err)
-			return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-				Error: err.Error(),
+			loggers.Warn.Println(err.Error)
+			return ctx.JSON(err.Status, dto.ResponseJson{
+				Error: err.Error,
 			})
 		}
 	} else {
-		return ctx.JSON(http.StatusUnauthorized, dto.ResponseJson{
+		return ctx.JSON(http.StatusForbidden, dto.ResponseJson{
 			Message: "Only admins are allowed",
 		})
 	}
@@ -121,9 +135,7 @@ func (handler *CategoryHandler) UpdateCategory(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Category updated successfully",
 		Data: map[string]interface{}{
-			"category_name": category.Category_name,
-			"description":   category.Description,
-			"updated_at":    category.UpdatedAt,
+			"category_id": category.CategoryID,
 		},
 	})
 }
@@ -140,16 +152,15 @@ func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 		})
 	}
 
-	getRole := (ctx.Get("role"))
-	role := getRole.(string)
+	roleCtx := ctx.Get("role").(string)
 
-	if role == "admin" {
+	if validation.CheckRole(roleCtx) {
 		//call the delete category service
-		category, err := handler.Category.DeleteCategory(categoryid, role)
+		category, err := handler.Category.DeleteCategory(categoryid, roleCtx)
 		if err != nil {
-			loggers.Warn.Println(err)
-			return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-				Error: err.Error(),
+			loggers.Warn.Println(err.Error)
+			return ctx.JSON(err.Status, dto.ResponseJson{
+				Error: err.Error,
 			})
 		}
 
@@ -157,11 +168,10 @@ func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 			Message: "Category deleted successfully",
 			Data: map[string]interface{}{
 				"category_id": category.CategoryID,
-				"deleted_at":  category.DeletedAt,
 			},
 		})
 	} else {
-		return ctx.JSON(http.StatusUnauthorized, dto.ResponseJson{
+		return ctx.JSON(http.StatusForbidden, dto.ResponseJson{
 			Message: "Only admins are allowed",
 		})
 

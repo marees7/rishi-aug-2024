@@ -4,14 +4,14 @@ import (
 	"blogs/common/dto"
 	"blogs/pkg/models"
 	"errors"
-	"fmt"
+	"net/http"
 
 	"gorm.io/gorm"
 )
 
 type AuthRepository interface {
 	Signup(*models.User) error
-	Login(details *dto.LoginRequest) (*models.User, error)
+	Login(details *dto.LoginRequest) (*models.User, *dto.ErrorResponse)
 }
 
 type authRepository struct {
@@ -32,14 +32,14 @@ func (db *authRepository) Signup(user *models.User) error {
 }
 
 // login a new user
-func (db *authRepository) Login(details *dto.LoginRequest) (*models.User, error) {
+func (db *authRepository) Login(details *dto.LoginRequest) (*models.User, *dto.ErrorResponse) {
 	var user models.User
 
 	data := db.Where("email=?", details.Email).First(&user)
 	if errors.Is(data.Error, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("user not found")
+		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "user not found"}
 	} else if data.Error != nil {
-		return nil, data.Error
+		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
 	return &user, nil
 }

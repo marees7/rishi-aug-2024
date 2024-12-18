@@ -4,13 +4,14 @@ import (
 	"blogs/api/repositories"
 	"blogs/common/dto"
 	"blogs/pkg/models"
+	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthServices interface {
 	Signup(user *models.User) error
-	Login(login *dto.LoginRequest) (*models.User, error)
+	Login(login *dto.LoginRequest) (*models.User, *dto.ErrorResponse)
 }
 
 type authService struct {
@@ -36,13 +37,13 @@ func (repo *authService) Signup(user *models.User) error {
 }
 
 // compares the hashed password lets the user login
-func (repo *authService) Login(login *dto.LoginRequest) (*models.User, error) {
+func (repo *authService) Login(login *dto.LoginRequest) (*models.User, *dto.ErrorResponse) {
 	user, err := repo.AuthRepository.Login(login)
 	if err != nil {
 		return nil, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password)); err != nil {
-		return nil, err
+		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: "password didn't match"}
 	}
 	return user, nil
 

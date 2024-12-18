@@ -12,7 +12,7 @@ import (
 
 func PostRoute(server *echo.Echo, db *gorm.DB) {
 	//send the db connection to the repository package
-	postRepository := repositories.InitpostRepository(db)
+	postRepository := repositories.InitPostRepository(db)
 
 	//send the repo to the services package
 	postService := services.InitPostService(postRepository)
@@ -22,10 +22,11 @@ func PostRoute(server *echo.Echo, db *gorm.DB) {
 
 	//group user routes
 	users := server.Group("v1/users")
-	users.Use(middlewares.TokenValidation)
+	users.Use(middlewares.ValidateToken)
 
 	users.POST("/posts", handler.CreatePost)
 	users.GET("/posts", handler.GetPosts)
+	users.GET("/posts/:post_id", handler.GetPost)
 	users.PUT("/posts/:post_id", handler.UpdatePost)
 	users.DELETE("/posts/:post_id", handler.DeletePost)
 }

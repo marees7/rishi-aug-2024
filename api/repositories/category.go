@@ -1,9 +1,10 @@
 package repositories
 
 import (
+	"blogs/common/dto"
 	"blogs/pkg/models"
 	"errors"
-	"fmt"
+	"net/http"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -11,9 +12,9 @@ import (
 
 type CategoryRepository interface {
 	CreateCategory(category *models.Category) error
-	GetCategories() (*[]models.Category, error)
-	UpdateCategory(category *models.Category, categoryid uuid.UUID) error
-	DeleteCategory(categoryid uuid.UUID) (*models.Category, error)
+	GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse)
+	UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse
+	DeleteCategory(categoryid uuid.UUID) (*models.Category, *dto.ErrorResponse)
 }
 
 type categoryRepository struct {
@@ -34,58 +35,56 @@ func (db *categoryRepository) CreateCategory(category *models.Category) error {
 }
 
 // retrieve every categories available
-func (db *categoryRepository) GetCategories() (*[]models.Category, error) {
+func (db *categoryRepository) GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse) {
 	var categories []models.Category
 
-	data := db.Find(&categories)
+	data := db.Limit(limit).Offset(offset).Find(&categories)
 	if errors.Is(data.Error, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("user not found")
+		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "category not found"}
 	} else if data.Error != nil {
-		return nil, data.Error
+		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	}
 	return &categories, nil
 }
 
 // update an existing category
-func (db *categoryRepository) UpdateCategory(category *models.Category, categoryid uuid.UUID) error {
-	var checkCategory models.Category
+func (db *categoryRepository) UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse {
+	var categoryData models.Category
 
 	//check if the category exists
-	data := db.Where("category_id=?", categoryid).First(&checkCategory)
+	data := db.Where("category_id=?", categoryid).First(&categoryData)
 	if data.Error != nil {
-		return data.Error
-	} else if checkCategory.CategoryID != categoryid {
-		return fmt.Errorf("category id not found")
+		return &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	}
 
 	//updates the category if it is the admin
 	data = db.Where("category_id=?", categoryid).Updates(&category)
 	if data.Error != nil {
-		return data.Error
+		return &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	} else if data.RowsAffected == 0 {
-		return fmt.Errorf("no rows affected")
+		return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
+	category.CategoryID = categoryData.CategoryID
+
 	return nil
 }
 
 // deletes the existing category
-func (db *categoryRepository) DeleteCategory(categoryid uuid.UUID) (*models.Category, error) {
-	var checkCategory models.Category
+func (db *categoryRepository) DeleteCategory(categoryid uuid.UUID) (*models.Category, *dto.ErrorResponse) {
+	var categoryData models.Category
 
 	//check if the record exists
-	data := db.Where("category_id=?", categoryid).First(&checkCategory)
+	data := db.Where("category_id=?", categoryid).First(&categoryData)
 	if data.Error != nil {
-		return nil, data.Error
-	} else if checkCategory.CategoryID != categoryid {
-		return nil, fmt.Errorf("category id not found")
+		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "category not found"}
 	}
 
 	//deletes the category if it is the admin
-	data = db.Where("category_id=?", categoryid).Delete(&checkCategory)
+	data = db.Where("category_id=?", categoryid).Delete(&categoryData)
 	if data.Error != nil {
-		return nil, data.Error
+		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	} else if data.RowsAffected == 0 {
-		return nil, fmt.Errorf("no rows affected")
+		return nil, &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
-	return &checkCategory, nil
+	return &categoryData, nil
 }

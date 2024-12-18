@@ -2,16 +2,17 @@ package services
 
 import (
 	"blogs/api/repositories"
+	"blogs/common/dto"
 	"blogs/pkg/models"
 
 	"github.com/google/uuid"
 )
 
 type CategoryServices interface {
-	GetCategories() (*[]models.Category, error)
 	CreateCategory(category *models.Category) error
-	UpdateCategory(category *models.Category, categoryid uuid.UUID) error
-	DeleteCategory(categoryid uuid.UUID, role string) (*models.Category, error)
+	GetCategories(limit, page int) (*[]models.Category, *dto.ErrorResponse)
+	UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse
+	DeleteCategory(categoryid uuid.UUID, role string) (*models.Category, *dto.ErrorResponse)
 }
 
 type userService struct {
@@ -22,36 +23,24 @@ func InitCategoryService(category repositories.CategoryRepository) CategoryServi
 	return &userService{category}
 }
 
-// retrieve every categories
-func (repo *userService) GetCategories() (*[]models.Category, error) {
-	category, err := repo.Category.GetCategories()
-	if err != nil {
-		return nil, err
-	}
-	return category, nil
-}
-
 // create a new category
 func (repo *userService) CreateCategory(category *models.Category) error {
-	if err := repo.Category.CreateCategory(category); err != nil {
-		return err
-	}
-	return nil
+	return repo.Category.CreateCategory(category)
+}
+
+// retrieve every categories
+func (repo *userService) GetCategories(limit, page int) (*[]models.Category, *dto.ErrorResponse) {
+	offset := (page - 1) * limit
+
+	return repo.Category.GetCategories(limit, offset)
 }
 
 // update a existing category
-func (repo *userService) UpdateCategory(category *models.Category, categoryid uuid.UUID) error {
-	if err := repo.Category.UpdateCategory(category, categoryid); err != nil {
-		return err
-	}
-	return nil
+func (repo *userService) UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse {
+	return repo.Category.UpdateCategory(category, categoryid)
 }
 
 // delete a existing category
-func (repo *userService) DeleteCategory(categoryid uuid.UUID, role string) (*models.Category, error) {
-	category, err := repo.Category.DeleteCategory(categoryid)
-	if err != nil {
-		return nil, err
-	}
-	return category, nil
+func (repo *userService) DeleteCategory(categoryid uuid.UUID, role string) (*models.Category, *dto.ErrorResponse) {
+	return repo.Category.DeleteCategory(categoryid)
 }

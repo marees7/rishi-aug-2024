@@ -3,10 +3,12 @@ package handlers
 import (
 	"blogs/api/services"
 	"blogs/api/validation"
+	"blogs/common/constants"
 	"blogs/common/dto"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -27,30 +29,29 @@ func (handler *PostHandler) CreatePost(ctx echo.Context) error {
 		})
 	}
 
-	if err := validation.PostsValidation(&post); err != nil {
+	if err := validation.ValidatePost(&post); err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
-	user := ctx.Get("user_id")
-	user_str := user.(string)
+	userIDCtx := ctx.Get("user_id").(string)
 
-	userid, err := uuid.Parse(user_str)
+	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
-	post.UserID = userid
+	post.UserID = userID
 
 	//call the create post service
 	if err := handler.PostServices.CreatePost(&post); err != nil {
 		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-			Error: err.Error(),
+		return ctx.JSON(err.Status, dto.ResponseJson{
+			Error: err.Error,
 		})
 	}
 
@@ -65,7 +66,7 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 	var post models.Post
 	id := (ctx.Param("post_id"))
 
-	postid, err := uuid.Parse(id)
+	postID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -80,36 +81,28 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 		})
 	}
 
-	user := ctx.Get("user_id")
-	user_str := user.(string)
+	userIDCtx := ctx.Get("user_id").(string)
 
-	userid, err := uuid.Parse(user_str)
+	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
-	post.UserID = userid
-
-	getRole := (ctx.Get("role"))
-	role := getRole.(string)
+	post.UserID = userID
 
 	//call the update post service
-	if err := handler.PostServices.UpdatePost(&post, postid, role); err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-			Error: err.Error(),
+	if err := handler.PostServices.UpdatePost(&post, postID); err != nil {
+		loggers.Warn.Println(err.Error)
+		return ctx.JSON(err.Status, dto.ResponseJson{
+			Error: err.Error,
 		})
 	}
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Post updated successfully",
-		Data: map[string]interface{}{
-			"title":       post.Title,
-			"content":     post.Content,
-			"description": post.Description,
-		},
+		Data:    post.PostID,
 	})
 }
 
@@ -117,7 +110,7 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 	id := (ctx.Param("post_id"))
 
-	postid, err := uuid.Parse(id)
+	postID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -125,10 +118,9 @@ func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 		})
 	}
 
-	user := ctx.Get("user_id")
-	user_str := user.(string)
+	userIDCtx := ctx.Get("user_id").(string)
 
-	userid, err := uuid.Parse(user_str)
+	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -136,15 +128,14 @@ func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 		})
 	}
 
-	getRole := (ctx.Get("role"))
-	role := getRole.(string)
+	roleCtx := ctx.Get("role").(string)
 
 	//call the delete post service
-	post, err := handler.PostServices.DeletePost(userid, postid, role)
-	if err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-			Error: err.Error(),
+	post, errs := handler.PostServices.DeletePost(userID, postID, roleCtx)
+	if errs != nil {
+		loggers.Warn.Println(errs.Error)
+		return ctx.JSON(errs.Status, dto.ResponseJson{
+			Error: errs.Error,
 		})
 	}
 
@@ -161,32 +152,49 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 
 	id := ctx.QueryParam("post_id")
 
-	postid, err := uuid.Parse(id)
+	postID, err := uuid.Parse(id)
 	if id == "" {
-		postid = uuid.Nil
+		postID = uuid.Nil
 	} else if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
-
 	title := ctx.QueryParam("title")
 
-	if startDate == "" && endDate != "" {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
-			Error: "End date is not specified",
-		})
-	} else if startDate != "" && endDate == "" {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
-			Error: "Start date is not specified",
+	//pagination
+	pages := ctx.QueryParam("offset")
+	page, err := strconv.Atoi(pages)
+	if pages == "" {
+		page = constants.DefaultOffset
+	} else if err != nil {
+		loggers.Warn.Println(err.Error())
+		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
+			Error: err.Error(),
 		})
 	}
 
+	pageSize := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(pageSize)
+	if pageSize == "" {
+		limit = constants.DefaultLimit
+	} else if err != nil {
+		loggers.Warn.Println(err.Error())
+		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
+			Error: err.Error(),
+		})
+	}
+	postMap := map[string]interface{}{
+		"startDate": startDate,
+		"endDate":   endDate,
+		"title":     title,
+		"limit":     limit,
+		"offset":    page,
+	}
+
 	//call the retrieve post service
-	posts, err := handler.PostServices.GetPosts(startDate, endDate, postid, title)
+	posts, err := handler.PostServices.GetPosts(postID, postMap)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
@@ -197,5 +205,30 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Posts retrieved successfully",
 		Data:    posts,
+	})
+}
+
+func (handler *PostHandler) GetPost(ctx echo.Context) error {
+	postCtx := ctx.Param("post_id")
+
+	postID, err := uuid.Parse(postCtx)
+	if err != nil {
+		loggers.Warn.Println(err)
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
+			Error: err.Error(),
+		})
+	}
+
+	post, err := handler.PostServices.GetPost(postID)
+	if err != nil {
+		loggers.Warn.Println(err)
+		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
+			Error: err.Error(),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, dto.ResponseJson{
+		Message: "Post retrieved successfully",
+		Data:    post,
 	})
 }

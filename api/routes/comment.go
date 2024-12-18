@@ -22,10 +22,10 @@ func CommentRoute(server *echo.Echo, db *gorm.DB) {
 
 	//group user routes
 	users := server.Group("v1/users")
-	users.Use(middlewares.TokenValidation)
+	users.Use(middlewares.ValidateToken)
 
 	users.POST("/comments/:post_id", handler.CreateComment)
+	users.GET("/comments/:post_id", handler.GetComments)
 	users.PUT("/comments/:comment_id", handler.UpdateComment)
 	users.DELETE("/comments/:comment_id", handler.DeleteComment)
-	users.GET("/comments", handler.GetComment)
 }

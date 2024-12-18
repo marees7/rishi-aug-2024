@@ -21,13 +21,13 @@ type User struct {
 }
 
 type Category struct {
-	CategoryID    uuid.UUID      `json:"category_id,omitempty" gorm:"type:uuid;primary_key"`
-	Category_name string         `json:"category_name,omitempty" gorm:"unique;not null;"`
-	Description   string         `json:"description,omitempty"`
-	Posts         []Post         `json:"posts,omitempty" gorm:"foreignKey:CategoryID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CreatedAt     time.Time      `json:"created_at,omitempty" gorm:"autoCreateTime;"`
-	UpdatedAt     time.Time      `json:"updated_at,omitempty" gorm:"autoUpdateTime;"`
-	DeletedAt     gorm.DeletedAt `json:"-"`
+	CategoryID   uuid.UUID      `json:"category_id,omitempty" gorm:"type:uuid;primary_key"`
+	CategoryName string         `json:"category_name,omitempty" gorm:"unique;not null;"`
+	Description  string         `json:"description,omitempty"`
+	Posts        []Post         `json:"posts,omitempty" gorm:"foreignKey:CategoryID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CreatedAt    time.Time      `json:"created_at,omitempty" gorm:"autoCreateTime;"`
+	UpdatedAt    time.Time      `json:"updated_at,omitempty" gorm:"autoUpdateTime;"`
+	DeletedAt    gorm.DeletedAt `json:"-"`
 }
 
 type Post struct {

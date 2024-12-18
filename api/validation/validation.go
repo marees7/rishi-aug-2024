@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"blogs/common/constants"
 	"blogs/pkg/models"
 	"fmt"
 
@@ -8,7 +9,7 @@ import (
 )
 
 // validates the user fields
-func UserValidation(user *models.User) error {
+func ValidateUser(user *models.User) error {
 	//check email address
 	validate := validator.New()
 	err := validate.Struct(user)
@@ -27,7 +28,7 @@ func UserValidation(user *models.User) error {
 	}
 
 	//check role
-	if user.Role != "admin" && user.Role != "user" {
+	if user.Role != constants.AdminRole && user.Role != "user" {
 		return fmt.Errorf("role must be either admin or user")
 	}
 
@@ -35,22 +36,22 @@ func UserValidation(user *models.User) error {
 }
 
 // Validates the category fields
-func CategoryValidation(category *models.Category) error {
+func ValidateCategory(category *models.Category) error {
 	//check category name
-	if category.Category_name == "" {
+	if category.CategoryName == "" {
 		return fmt.Errorf("category name cannot be empty")
 	}
 
 	//check description
 	if category.Description == "" {
-		return fmt.Errorf("descroption cannot be empty")
+		return fmt.Errorf("description cannot be empty")
 	}
 
 	return nil
 }
 
 // Validate the posts fields
-func PostsValidation(post *models.Post) error {
+func ValidatePost(post *models.Post) error {
 	//check category name
 	if post.Title == "" {
 		return fmt.Errorf("title cannot be empty")
@@ -63,18 +64,23 @@ func PostsValidation(post *models.Post) error {
 
 	//check description
 	if post.Description == "" {
-		return fmt.Errorf("descroption cannot be empty")
+		return fmt.Errorf("description cannot be empty")
 	}
 
 	return nil
 }
 
 // Validate the comments fields
-func CommentValidation(comment *models.Comment) error {
+func ValidateComment(comment *models.Comment) error {
 	//check content
 	if comment.Content == "" {
 		return fmt.Errorf("content cannot be empty")
 	}
 
 	return nil
+}
+
+// Check role
+func CheckRole(role string) bool {
+	return role == constants.AdminRole
 }

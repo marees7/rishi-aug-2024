@@ -13,14 +13,16 @@ import (
 func AdminRoute(server *echo.Echo, db *gorm.DB) {
 	//send the db connection to the repository package
 	userRepository := repositories.InitUserRepository(db)
+
 	//send the repo to the services package
 	adminService := services.InitAdminService(userRepository)
 
+	//Initialize the handler struct
 	handler := &handlers.AdminHandler{AdminServices: adminService}
 
 	//group admin routes
 	admin := server.Group("v1/admin")
-	admin.Use(middlewares.TokenValidation)
+	admin.Use(middlewares.ValidateToken)
 
 	admin.GET("/users", handler.GetUsers)
 	admin.GET("/users/:username", handler.GetUser)
