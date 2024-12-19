@@ -10,9 +10,9 @@ import (
 
 type CommentService interface {
 	CreateComment(comment *models.Comment) *dto.ErrorResponse
-	GetComments(postID uuid.UUID, commentMap map[string]interface{}) (*[]models.Comment, *dto.ErrorResponse)
-	UpdateComment(comment *models.Comment, commentid uuid.UUID) *dto.ErrorResponse
-	DeleteComment(userID uuid.UUID, commentid uuid.UUID, role string) (*models.Comment, *dto.ErrorResponse)
+	GetComments(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Comment, *dto.ErrorResponse)
+	UpdateComment(comment *models.Comment, commentID uuid.UUID) *dto.ErrorResponse
+	DeleteComment(userID uuid.UUID, commentID uuid.UUID, role string) (*models.Comment, *dto.ErrorResponse)
 }
 
 type commentService struct {
@@ -29,18 +29,18 @@ func (repo *commentService) CreateComment(comment *models.Comment) *dto.ErrorRes
 }
 
 // retrieve comments using post id
-func (repo *commentService) GetComments(postID uuid.UUID, commentMap map[string]interface{}) (*[]models.Comment, *dto.ErrorResponse) {
-	commentMap["offset"] = (commentMap["offset"].(int) - 1) * commentMap["limit"].(int)
+func (repo *commentService) GetComments(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Comment, *dto.ErrorResponse) {
+	keywords["offset"] = (keywords["offset"].(int) - 1) * keywords["limit"].(int)
 
-	return repo.CommentRepository.GetComments(postID, commentMap)
+	return repo.CommentRepository.GetComments(postID, keywords)
 }
 
 // update a existing comment
-func (repo *commentService) UpdateComment(comment *models.Comment, commentid uuid.UUID) *dto.ErrorResponse {
-	return repo.CommentRepository.UpdateComment(comment, commentid)
+func (repo *commentService) UpdateComment(comment *models.Comment, commentID uuid.UUID) *dto.ErrorResponse {
+	return repo.CommentRepository.UpdateComment(comment, commentID)
 }
 
 // delete the existing comment
-func (repo *commentService) DeleteComment(userID uuid.UUID, commentid uuid.UUID, role string) (*models.Comment, *dto.ErrorResponse) {
-	return repo.CommentRepository.DeleteComment(userID, commentid, role)
+func (repo *commentService) DeleteComment(userID uuid.UUID, commentID uuid.UUID, role string) (*models.Comment, *dto.ErrorResponse) {
+	return repo.CommentRepository.DeleteComment(userID, commentID, role)
 }

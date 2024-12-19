@@ -10,6 +10,7 @@ import (
 type User struct {
 	UserID    uuid.UUID      `json:"user_id,omitempty" gorm:"type:uuid;primary_key"`
 	Email     string         `json:"email,omitempty" validate:"required,email" gorm:"unique;not null;"`
+	Name      string         `json:"name,omitempty" gorm:"not null;default:'anonymous'"`
 	Username  string         `json:"username,omitempty" gorm:"unique;not null;"`
 	Password  string         `json:"password,omitempty" gorm:"not null;"`
 	Role      string         `json:"role,omitempty" gorm:"check:role='admin' or role='user'"`

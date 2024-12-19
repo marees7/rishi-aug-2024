@@ -37,15 +37,12 @@ func (handler *AuthHandler) Signup(ctx echo.Context) error {
 
 	//call the signup service
 	if err := handler.AuthServices.Signup(&user); err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-			Error: err.Error(),
-		})
+		loggers.Warn.Println(err.Error)
+		return ctx.JSON(err.Status, dto.ResponseJson{Error: err.Error})
 	}
 
 	return ctx.JSON(http.StatusCreated, dto.ResponseJson{
 		Message: "User created successfully",
-		Data:    user.Email,
 	})
 }
 
@@ -75,11 +72,11 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	}
 
 	//call the login service
-	user, errs := handler.AuthServices.Login(&login)
-	if errs != nil {
-		loggers.Warn.Println(errs.Error)
-		return ctx.JSON(errs.Status, dto.ResponseJson{
-			Error: errs.Error,
+	user, errorResponse := handler.AuthServices.Login(&login)
+	if errorResponse != nil {
+		loggers.Warn.Println(errorResponse.Error)
+		return ctx.JSON(errorResponse.Status, dto.ResponseJson{
+			Error: errorResponse.Error,
 		})
 	}
 

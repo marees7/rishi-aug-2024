@@ -21,9 +21,9 @@ func AdminRoute(server *echo.Echo, db *gorm.DB) {
 	handler := &handlers.AdminHandler{AdminServices: adminService}
 
 	//group admin routes
-	admin := server.Group("v1/admin")
+	admin := server.Group("v1/admin/users")
 	admin.Use(middlewares.ValidateToken)
 
-	admin.GET("/users", handler.GetUsers)
-	admin.GET("/users/:username", handler.GetUser)
+	admin.GET("", handler.GetUsers)
+	admin.GET("/:username", handler.GetUser)
 }

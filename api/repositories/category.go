@@ -3,7 +3,6 @@ package repositories
 import (
 	"blogs/common/dto"
 	"blogs/pkg/models"
-	"errors"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -11,7 +10,7 @@ import (
 )
 
 type CategoryRepository interface {
-	CreateCategory(category *models.Category) error
+	CreateCategory(category *models.Category) *dto.ErrorResponse
 	GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse)
 	UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse
 	DeleteCategory(categoryid uuid.UUID) (*models.Category, *dto.ErrorResponse)
@@ -26,10 +25,17 @@ func InitCategoryRepository(db *gorm.DB) CategoryRepository {
 }
 
 // creates a new category
-func (db *categoryRepository) CreateCategory(category *models.Category) error {
-	data := db.Create(&category)
+func (db *categoryRepository) CreateCategory(category *models.Category) *dto.ErrorResponse {
+	//check if the category already exists
+	data := db.Where("category_name=?", category.CategoryName).First(&category)
+	if data.RowsAffected > 0 {
+		return &dto.ErrorResponse{Status: http.StatusConflict, Error: "category already exists"}
+	}
+
+	//create the category
+	data = db.Create(&category)
 	if data.Error != nil {
-		return data.Error
+		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
 	return nil
 }
@@ -39,10 +45,8 @@ func (db *categoryRepository) GetCategories(limit, offset int) (*[]models.Catego
 	var categories []models.Category
 
 	data := db.Limit(limit).Offset(offset).Find(&categories)
-	if errors.Is(data.Error, gorm.ErrRecordNotFound) {
-		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "category not found"}
-	} else if data.Error != nil {
-		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
+	if data.Error != nil {
+		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
 	return &categories, nil
 }

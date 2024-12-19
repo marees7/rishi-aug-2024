@@ -14,8 +14,8 @@ import (
 
 type PostRepository interface {
 	CreatePost(post *models.Post) *dto.ErrorResponse
-	GetPosts(postID uuid.UUID, postMap map[string]interface{}) (*[]models.Post, error)
-	GetPost(postID uuid.UUID) (*models.Post, error)
+	GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error)
+	GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorResponse)
 	UpdatePost(post *models.Post, postID uuid.UUID) *dto.ErrorResponse
 	DeletePost(userID uuid.UUID, postID uuid.UUID, role string) (*models.Post, *dto.ErrorResponse)
 }
@@ -47,62 +47,39 @@ func (db *postRepository) CreatePost(post *models.Post) *dto.ErrorResponse {
 }
 
 // retrieve every users posts using either date or post id
-func (db *postRepository) GetPosts(postID uuid.UUID, postMap map[string]interface{}) (*[]models.Post, error) {
+func (db *postRepository) GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error) {
 	var post []models.Post
-	startDate := postMap["startDate"].(string)
-	endDate := postMap["endDate"].(string)
-	title := postMap["title"].(string)
-	limit := postMap["limit"].(int)
-	offset := postMap["offset"].(int)
+	fromDate := keywords["fromDate"].(string)
+	toDate := keywords["toDate"].(string)
+	title := keywords["title"].(string)
+	limit := keywords["limit"].(int)
+	offset := keywords["offset"].(int)
 
 	//check whether to use date filter or post id
-	if startDate != "" && endDate != "" && postID != uuid.Nil {
-		data := db.Where("created_at BETWEEN ? AND ? AND post_id= ?", startDate, endDate, postID).Preload("Comments").Limit(limit).Offset(offset).Find(&post)
-		if data.Error != nil {
-			return nil, data.Error
-		}
-	} else if startDate != "" && endDate != "" {
-		data := db.Where("created_at BETWEEN ? AND ?", startDate, endDate).Preload("Comments").Limit(limit).Offset(offset).Find(&post)
-		if data.Error != nil {
-			return nil, data.Error
-		}
-	} else if startDate != "" && endDate == "" {
-		data := db.Where("created_at > ?", startDate).Preload("Comments").Limit(limit).Offset(offset).Find(&post)
-		if data.Error != nil {
-			return nil, data.Error
-		}
-	} else if startDate == "" && endDate != "" {
-		data := db.Where("created_at < ?", endDate).Preload("Comments").Limit(limit).Offset(offset).Find(&post)
-		if data.Error != nil {
-			return nil, data.Error
-		}
-	} else if postID != uuid.Nil {
-		data := db.Where("post_id=?", postID).Preload("Comments").Limit(limit).Offset(offset).Find(&post)
-		if data.Error != nil {
-			return nil, data.Error
-		}
+	data := db.Preload("Comments").Limit(limit).Offset(offset).Find(&post)
+	if data.Error != nil {
+		return nil, data.Error
+	}
+	if fromDate != "" && toDate != "" {
+		db.Preload("Comments").Where("created_at BETWEEN ? AND ?", fromDate, toDate)
+	} else if fromDate != "" && toDate == "" {
+		db.Preload("Comments").Where("created_at >= ?", fromDate)
+	} else if fromDate == "" && toDate != "" {
+		db.Preload("Comments").Where("created_at <= ?", toDate)
 	} else if title != "" {
-		data := db.Where("title LIKE '%' || ? || '%' ", title).Preload("Comments").Limit(limit).Offset(offset).Find(&post)
-		if data.Error != nil {
-			return nil, data.Error
-		}
-	} else {
-		data := db.Preload("Comments").Limit(limit).Offset(offset).Find(&post)
-		if data.Error != nil {
-			return nil, data.Error
-		}
+		db.Preload("Comments").Where("title LIKE '%' || ? || '%' ", title)
 	}
 	return &post, nil
 }
 
-func (db *postRepository) GetPost(postID uuid.UUID) (*models.Post, error) {
+func (db *postRepository) GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorResponse) {
 	var post models.Post
 
 	data := db.Where("post_id=?", postID).Preload("Comments").First(&post)
-	if data.Error != nil {
-		if data.Error != nil {
-			return nil, data.Error
-		}
+	if errors.Is(data.Error, gorm.ErrRecordNotFound) {
+		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: "post not found"}
+	} else if data.Error != nil {
+		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
 	return &post, nil
 }
@@ -116,7 +93,7 @@ func (db *postRepository) UpdatePost(post *models.Post, postID uuid.UUID) *dto.E
 	if data.Error != nil {
 		return &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	} else if postData.UserID != post.UserID {
-		return &dto.ErrorResponse{Status: http.StatusUnauthorized, Error: "cannot update other users post"}
+		return &dto.ErrorResponse{Status: http.StatusForbidden, Error: "cannot update other users post"}
 
 	}
 
@@ -143,11 +120,11 @@ func (db *postRepository) DeletePost(userID uuid.UUID, postID uuid.UUID, role st
 	if data.Error != nil {
 		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	} else if postData.UserID != userID && role != constants.AdminRole {
-		return nil, &dto.ErrorResponse{Status: http.StatusUnauthorized, Error: "cannot delete other users post"}
+		return nil, &dto.ErrorResponse{Status: http.StatusForbidden, Error: "cannot delete other users post"}
 	}
 
 	//deletes the record if the user created it or if it is the admin
-	if postData.UserID == userID || validation.CheckRole(role) {
+	if postData.UserID == userID || validation.ValidateRole(role) {
 		data := db.Where("post_id=?", postID).Delete(&postData)
 		if data.Error != nil {
 			return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}

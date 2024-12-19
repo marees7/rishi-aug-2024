@@ -10,8 +10,8 @@ import (
 
 type PostServices interface {
 	CreatePost(post *models.Post) *dto.ErrorResponse
-	GetPosts(postID uuid.UUID, postMap map[string]interface{}) (*[]models.Post, error)
-	GetPost(postID uuid.UUID) (*models.Post, error)
+	GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error)
+	GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorResponse)
 	UpdatePost(post *models.Post, postID uuid.UUID) *dto.ErrorResponse
 	DeletePost(userID uuid.UUID, postID uuid.UUID, role string) (*models.Post, *dto.ErrorResponse)
 }
@@ -30,14 +30,14 @@ func (repo postService) CreatePost(post *models.Post) *dto.ErrorResponse {
 }
 
 // retrieve every users posts using date or post id
-func (repo postService) GetPosts(postID uuid.UUID, postMap map[string]interface{}) (*[]models.Post, error) {
-	postMap["offset"] = (postMap["offset"].(int) - 1) * postMap["limit"].(int)
+func (repo postService) GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error) {
+	keywords["offset"] = (keywords["offset"].(int) - 1) * keywords["limit"].(int)
 
-	return repo.PostRepository.GetPosts(postID, postMap)
+	return repo.PostRepository.GetPosts(postID, keywords)
 }
 
 // retrieve single user posts using title or post id
-func (repo postService) GetPost(postID uuid.UUID) (*models.Post, error) {
+func (repo postService) GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorResponse) {
 	return repo.PostRepository.GetPost(postID)
 }
 

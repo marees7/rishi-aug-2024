@@ -52,7 +52,7 @@ func ValidateCategory(category *models.Category) error {
 
 // Validate the posts fields
 func ValidatePost(post *models.Post) error {
-	//check category name
+	//check title
 	if post.Title == "" {
 		return fmt.Errorf("title cannot be empty")
 	}
@@ -81,6 +81,6 @@ func ValidateComment(comment *models.Comment) error {
 }
 
 // Check role
-func CheckRole(role string) bool {
+func ValidateRole(role string) bool {
 	return role == constants.AdminRole
 }

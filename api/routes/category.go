@@ -21,16 +21,16 @@ func CategoryRoute(server *echo.Echo, db *gorm.DB) {
 	handler := &handlers.CategoryHandler{Category: userService}
 
 	//group user routes
-	users := server.Group("v1/users")
+	users := server.Group("v1/users/categories")
 	users.Use(middlewares.ValidateToken)
 
-	users.GET("/categories", handler.Getcategories)
+	users.GET("", handler.Getcategories)
 
 	//group admin routes
-	admin := server.Group("v1/admin")
+	admin := server.Group("v1/admin/categories")
 	admin.Use(middlewares.ValidateToken)
 
-	admin.POST("/categories", handler.CreateCategory)
-	admin.PUT("/categories/:category_id", handler.UpdateCategory)
-	admin.DELETE("/categories/:category_id", handler.DeleteCategory)
+	admin.POST("", handler.CreateCategory)
+	admin.PUT("/:category_id", handler.UpdateCategory)
+	admin.DELETE("/:category_id", handler.DeleteCategory)
 }

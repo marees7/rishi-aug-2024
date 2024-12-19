@@ -9,8 +9,8 @@ import (
 )
 
 type CategoryServices interface {
-	CreateCategory(category *models.Category) error
-	GetCategories(limit, page int) (*[]models.Category, *dto.ErrorResponse)
+	CreateCategory(category *models.Category) *dto.ErrorResponse
+	GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse)
 	UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse
 	DeleteCategory(categoryid uuid.UUID, role string) (*models.Category, *dto.ErrorResponse)
 }
@@ -24,13 +24,13 @@ func InitCategoryService(category repositories.CategoryRepository) CategoryServi
 }
 
 // create a new category
-func (repo *userService) CreateCategory(category *models.Category) error {
+func (repo *userService) CreateCategory(category *models.Category) *dto.ErrorResponse {
 	return repo.Category.CreateCategory(category)
 }
 
 // retrieve every categories
-func (repo *userService) GetCategories(limit, page int) (*[]models.Category, *dto.ErrorResponse) {
-	offset := (page - 1) * limit
+func (repo *userService) GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse) {
+	offset = (offset - 1) * limit
 
 	return repo.Category.GetCategories(limit, offset)
 }

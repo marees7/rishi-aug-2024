@@ -10,7 +10,7 @@ import (
 )
 
 type AuthRepository interface {
-	Signup(*models.User) error
+	Signup(*models.User) *dto.ErrorResponse
 	Login(details *dto.LoginRequest) (*models.User, *dto.ErrorResponse)
 }
 
@@ -23,10 +23,17 @@ func InitAuthRepository(db *gorm.DB) AuthRepository {
 }
 
 // creates a new user
-func (db *authRepository) Signup(user *models.User) error {
-	data := db.Create(&user)
+func (db *authRepository) Signup(user *models.User) *dto.ErrorResponse {
+	//check if the user already exists
+	data := db.Where("email=? OR username = ?", user.Email, user.Username).First(&user)
+	if data.RowsAffected > 0 {
+		return &dto.ErrorResponse{Status: http.StatusConflict, Error: "user already exists"}
+	}
+
+	//create the user
+	data = db.Create(&user)
 	if data.Error != nil {
-		return data.Error
+		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
 	return nil
 }

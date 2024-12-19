@@ -2,12 +2,13 @@ package services
 
 import (
 	"blogs/api/repositories"
+	"blogs/common/dto"
 	"blogs/pkg/models"
 )
 
 type AdminServices interface {
-	GetUsers(limit, page int) (*[]models.User, error)
-	GetUser(username string) (*models.User, error)
+	GetUsers(limit, offset int, name string) (*[]models.User, error)
+	GetUser(username string) (*models.User, *dto.ErrorResponse)
 }
 
 type adminService struct {
@@ -19,13 +20,13 @@ func InitAdminService(user repositories.UserRepository) AdminServices {
 }
 
 // retrieve every users records
-func (repo *adminService) GetUsers(limit, page int) (*[]models.User, error) {
-	offset := (page - 1) * limit
-	
-	return repo.Users.GetUsers(limit, offset)
+func (repo *adminService) GetUsers(limit, offset int, name string) (*[]models.User, error) {
+	offset = (offset - 1) * limit
+
+	return repo.Users.GetUsers(limit, offset, name)
 }
 
 // retrieve a single user records
-func (repo *adminService) GetUser(username string) (*models.User, error) {
+func (repo *adminService) GetUser(username string) (*models.User, *dto.ErrorResponse) {
 	return repo.Users.GetUser(username)
 }

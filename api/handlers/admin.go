@@ -3,11 +3,10 @@ package handlers
 import (
 	"blogs/api/services"
 	"blogs/api/validation"
-	"blogs/common/constants"
 	"blogs/common/dto"
+	"blogs/common/helpers"
 	"blogs/pkg/loggers"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -18,33 +17,23 @@ type AdminHandler struct {
 
 // retrieve every users records
 func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
-	pages := ctx.QueryParam("offset")
-	page, err := strconv.Atoi(pages)
-	if pages == "" {
-		page = constants.DefaultOffset
-	} else if err != nil {
-		loggers.Warn.Println(err.Error())
-		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
-			Error: err.Error(),
-		})
-	}
+	offsetStr := ctx.QueryParam("offset")
+	limitStr := ctx.QueryParam("limit")
 
-	pageSize := ctx.QueryParam("limit")
-	limit, err := strconv.Atoi(pageSize)
-	if pageSize == "" {
-		limit = constants.DefaultLimit
-	} else if err != nil {
-		loggers.Warn.Println(err.Error())
-		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
+	//pagination
+	limit, offset, err := helpers.Pagination(limitStr, offsetStr)
+	if err != nil {
+		loggers.Warn.Println(err)
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
+	name := ctx.QueryParam("name")
 
 	roleCtx := ctx.Get("role").(string)
-
-	if validation.CheckRole(roleCtx) {
+	if validation.ValidateRole(roleCtx) {
 		//call the get Users service
-		users, err := handler.AdminServices.GetUsers(limit, page)
+		users, err := handler.AdminServices.GetUsers(limit, offset, name)
 		if err != nil {
 			loggers.Warn.Println(err)
 			return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
@@ -68,14 +57,12 @@ func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 
 	roleCtx := ctx.Get("role").(string)
 
-	if validation.CheckRole(roleCtx) {
+	if validation.ValidateRole(roleCtx) {
 		//call the get User By ID service
 		users, err := handler.AdminServices.GetUser(username)
 		if err != nil {
-			loggers.Warn.Println(err)
-			return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
-				Error: err.Error(),
-			})
+			loggers.Warn.Println(err.Error)
+			return ctx.JSON(err.Status, dto.ResponseJson{Error: err.Error})
 		}
 		return ctx.JSON(http.StatusOK, dto.ResponseJson{
 			Message: "Users retreived successfully",

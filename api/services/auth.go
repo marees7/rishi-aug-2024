@@ -10,7 +10,7 @@ import (
 )
 
 type AuthServices interface {
-	Signup(user *models.User) error
+	Signup(user *models.User) *dto.ErrorResponse
 	Login(login *dto.LoginRequest) (*models.User, *dto.ErrorResponse)
 }
 
@@ -23,10 +23,10 @@ func InitAuthService(repository repositories.AuthRepository) AuthServices {
 }
 
 // hashes the password and sends it to the db
-func (repo *authService) Signup(user *models.User) error {
+func (repo *authService) Signup(user *models.User) *dto.ErrorResponse {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
-		return err
+		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: "could not generate password"}
 	}
 	user.Password = string(hashedPass)
 

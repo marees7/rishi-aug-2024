@@ -3,12 +3,11 @@ package handlers
 import (
 	"blogs/api/services"
 	"blogs/api/validation"
-	"blogs/common/constants"
 	"blogs/common/dto"
+	"blogs/common/helpers"
 	"blogs/pkg/loggers"
 	"blogs/pkg/models"
 	"net/http"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -21,7 +20,7 @@ type CommentHandler struct {
 // Create a new comment for a post
 func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 	var comment models.Comment
-	id := (ctx.Param("post_id"))
+	id := ctx.Param("post_id")
 
 	postID, err := uuid.Parse(id)
 	if err != nil {
@@ -71,12 +70,63 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 	})
 }
 
+// retrieve every comments of the post
+func (handler *CommentHandler) GetComments(ctx echo.Context) error {
+	var postID uuid.UUID
+
+	id := ctx.Param("post_id")
+	if id == "" {
+		postID = uuid.Nil
+	} else {
+		convPostID, err := uuid.Parse(id)
+		if err != nil {
+			loggers.Warn.Println(err)
+			return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
+				Error: err.Error(),
+			})
+		}
+		postID = convPostID
+	}
+	search := ctx.QueryParam("search")
+
+	//pagination
+	offsetStr := ctx.QueryParam("offset")
+	limitStr := ctx.QueryParam("limit")
+
+	limit, offset, err := helpers.Pagination(limitStr, offsetStr)
+	if err != nil {
+		loggers.Warn.Println(err)
+		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
+			Error: err.Error(),
+		})
+	}
+
+	keywords := map[string]interface{}{
+		"search": search,
+		"limit":  limit,
+		"offset": offset,
+	}
+
+	//call the retrieve comment service
+	comment, errorResponse := handler.CommentService.GetComments(postID, keywords)
+	if errorResponse != nil {
+		loggers.Warn.Println(errorResponse.Error)
+		return ctx.JSON(errorResponse.Status, dto.ResponseJson{
+			Error: errorResponse.Error,
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, dto.ResponseJson{
+		Message: "Comments retrieved successfully",
+		Data:    comment})
+}
+
 // update an existing comment
 func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	var comment models.Comment
 	id := (ctx.Param("comment_id"))
 
-	commentid, err := uuid.Parse(id)
+	commentID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -103,7 +153,7 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	comment.UserID = userID
 
 	//call the update comment service
-	if err := handler.CommentService.UpdateComment(&comment, commentid); err != nil {
+	if err := handler.CommentService.UpdateComment(&comment, commentID); err != nil {
 		loggers.Warn.Println(err.Error)
 		return ctx.JSON(err.Status, dto.ResponseJson{
 			Error: err.Error,
@@ -113,7 +163,7 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "comment updated successfully",
 		Data: map[string]interface{}{
-			"coment_id": comment.CommentID,
+			"comment_id": comment.CommentID,
 		},
 	})
 }
@@ -122,7 +172,7 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 	id := (ctx.Param("comment_id"))
 
-	commentid, err := uuid.Parse(id)
+	commentID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -143,11 +193,11 @@ func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 	roleCtx := ctx.Get("role").(string)
 
 	//call the delete comment service
-	comment, errs := handler.CommentService.DeleteComment(userID, commentid, roleCtx)
-	if errs != nil {
-		loggers.Warn.Println(errs.Error)
-		return ctx.JSON(errs.Status, dto.ResponseJson{
-			Error: errs.Error,
+	comment, errorResponse := handler.CommentService.DeleteComment(userID, commentID, roleCtx)
+	if errorResponse != nil {
+		loggers.Warn.Println(errorResponse.Error)
+		return ctx.JSON(errorResponse.Status, dto.ResponseJson{
+			Error: errorResponse.Error,
 		})
 	}
 
@@ -155,62 +205,4 @@ func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 		Message: "comment deleted successfully",
 		Data:    comment.CommentID,
 	})
-}
-
-// retrieve every comments of the post
-func (handler *CommentHandler) GetComments(ctx echo.Context) error {
-	id := ctx.Param("post_id")
-
-	postID, err := uuid.Parse(id)
-	if id == "" {
-		postID = uuid.Nil
-	} else if err != nil {
-		loggers.Warn.Println(err)
-		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
-			Error: err.Error(),
-		})
-	}
-	search := ctx.QueryParam("search")
-
-	//pagination
-	pages := ctx.QueryParam("offset")
-	page, err := strconv.Atoi(pages)
-	if pages == "" {
-		page = constants.DefaultOffset
-	} else if err != nil {
-		loggers.Warn.Println(err.Error())
-		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
-			Error: err.Error(),
-		})
-	}
-
-	pageSize := ctx.QueryParam("limit")
-	limit, err := strconv.Atoi(pageSize)
-	if pageSize == "" {
-		limit = constants.DefaultLimit
-	} else if err != nil {
-		loggers.Warn.Println(err.Error())
-		return ctx.JSON(http.StatusBadRequest, &dto.ResponseJson{
-			Error: err.Error(),
-		})
-	}
-
-	commentMap := map[string]interface{}{
-		"search": search,
-		"limit":  limit,
-		"offset": page,
-	}
-
-	//call the retrieve comment service
-	comment, errs := handler.CommentService.GetComments(postID, commentMap)
-	if errs != nil {
-		loggers.Warn.Println(errs.Error)
-		return ctx.JSON(errs.Status, dto.ResponseJson{
-			Error: errs.Error,
-		})
-	}
-
-	return ctx.JSON(http.StatusOK, dto.ResponseJson{
-		Message: "Comments retrieved successfully",
-		Data:    comment})
 }
