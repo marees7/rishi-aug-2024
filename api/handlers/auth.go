@@ -81,7 +81,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	}
 
 	//generate a new token
-	tokenstr, err := validation.GenerateToken(user)
+	tokenStr, err := validation.GenerateToken(user)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusUnauthorized, dto.ResponseJson{
@@ -92,7 +92,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 	//use the generated token to set a new cookie
 	ctx.SetCookie(&http.Cookie{
 		Name:     "Authorization",
-		Value:    tokenstr,
+		Value:    tokenStr,
 		MaxAge:   1800,
 		Secure:   false,
 		HttpOnly: true,

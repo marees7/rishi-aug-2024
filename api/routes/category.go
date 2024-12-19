@@ -24,7 +24,7 @@ func CategoryRoute(server *echo.Echo, db *gorm.DB) {
 	users := server.Group("v1/users/categories")
 	users.Use(middlewares.ValidateToken)
 
-	users.GET("", handler.Getcategories)
+	users.GET("", handler.GetCategories)
 
 	//group admin routes
 	admin := server.Group("v1/admin/categories")

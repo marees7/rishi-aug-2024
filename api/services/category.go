@@ -11,8 +11,8 @@ import (
 type CategoryServices interface {
 	CreateCategory(category *models.Category) *dto.ErrorResponse
 	GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse)
-	UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse
-	DeleteCategory(categoryid uuid.UUID, role string) (*models.Category, *dto.ErrorResponse)
+	UpdateCategory(category *models.Category, categoryID uuid.UUID) *dto.ErrorResponse
+	DeleteCategory(categoryID uuid.UUID, role string) (*models.Category, *dto.ErrorResponse)
 }
 
 type userService struct {
@@ -36,11 +36,11 @@ func (repo *userService) GetCategories(limit, offset int) (*[]models.Category, *
 }
 
 // update a existing category
-func (repo *userService) UpdateCategory(category *models.Category, categoryid uuid.UUID) *dto.ErrorResponse {
-	return repo.Category.UpdateCategory(category, categoryid)
+func (repo *userService) UpdateCategory(category *models.Category, categoryID uuid.UUID) *dto.ErrorResponse {
+	return repo.Category.UpdateCategory(category, categoryID)
 }
 
 // delete a existing category
-func (repo *userService) DeleteCategory(categoryid uuid.UUID, role string) (*models.Category, *dto.ErrorResponse) {
-	return repo.Category.DeleteCategory(categoryid)
+func (repo *userService) DeleteCategory(categoryID uuid.UUID, role string) (*models.Category, *dto.ErrorResponse) {
+	return repo.Category.DeleteCategory(categoryID)
 }

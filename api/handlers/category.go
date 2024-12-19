@@ -57,7 +57,7 @@ func (handler *CategoryHandler) CreateCategory(ctx echo.Context) error {
 }
 
 // retrieve every categories available
-func (handler *CategoryHandler) Getcategories(ctx echo.Context) error {
+func (handler *CategoryHandler) GetCategories(ctx echo.Context) error {
 	offsetStr := ctx.QueryParam("offset")
 	limitStr := ctx.QueryParam("limit")
 
@@ -89,7 +89,7 @@ func (handler *CategoryHandler) UpdateCategory(ctx echo.Context) error {
 	var category models.Category
 	id := (ctx.Param("category_id"))
 
-	categoryid, err := uuid.Parse(id)
+	categoryID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -107,7 +107,7 @@ func (handler *CategoryHandler) UpdateCategory(ctx echo.Context) error {
 
 	if validation.ValidateRole(roleCtx) {
 		//call the update category service
-		if err := handler.Category.UpdateCategory(&category, categoryid); err != nil {
+		if err := handler.Category.UpdateCategory(&category, categoryID); err != nil {
 			loggers.Warn.Println(err.Error)
 			return ctx.JSON(err.Status, dto.ResponseJson{
 				Error: err.Error,
@@ -131,7 +131,7 @@ func (handler *CategoryHandler) UpdateCategory(ctx echo.Context) error {
 func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 	id := (ctx.Param("category_id"))
 
-	categoryid, err := uuid.Parse(id)
+	categoryID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -143,7 +143,7 @@ func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 
 	if validation.ValidateRole(roleCtx) {
 		//call the delete category service
-		category, err := handler.Category.DeleteCategory(categoryid, roleCtx)
+		category, err := handler.Category.DeleteCategory(categoryID, roleCtx)
 		if err != nil {
 			loggers.Warn.Println(err.Error)
 			return ctx.JSON(err.Status, dto.ResponseJson{

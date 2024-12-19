@@ -41,7 +41,7 @@ func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
 			})
 		}
 		return ctx.JSON(http.StatusOK, dto.ResponseJson{
-			Message: "Users retreived successfully",
+			Message: "Users retrieved successfully",
 			Data:    users,
 		})
 	} else {
@@ -65,7 +65,7 @@ func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 			return ctx.JSON(err.Status, dto.ResponseJson{Error: err.Error})
 		}
 		return ctx.JSON(http.StatusOK, dto.ResponseJson{
-			Message: "Users retreived successfully",
+			Message: "Users retrieved successfully",
 			Data:    users,
 		})
 	} else {
