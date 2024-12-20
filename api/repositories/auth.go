@@ -50,5 +50,6 @@ func (db *authRepository) Login(details *dto.LoginRequest) (*models.User, *dto.E
 	} else if data.Error != nil {
 		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
+	
 	return &user, nil
 }

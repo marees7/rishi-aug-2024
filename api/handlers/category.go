@@ -78,6 +78,7 @@ func (handler *CategoryHandler) GetCategories(ctx echo.Context) error {
 			Error: errorResponse.Error,
 		})
 	}
+
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message:      "retrieved categories successfully",
 		Data:         categories,
@@ -164,6 +165,5 @@ func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 		return ctx.JSON(http.StatusForbidden, dto.ResponseJson{
 			Message: "Only admins are allowed",
 		})
-
 	}
 }

@@ -34,6 +34,7 @@ func ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 
 			return []byte(os.Getenv("SECRET_KEY")), nil
 		})
+		
 		if err != nil {
 			loggers.Warn.Println(err)
 			return c.JSON(http.StatusUnauthorized, dto.ResponseJson{

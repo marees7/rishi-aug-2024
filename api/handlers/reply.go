@@ -115,7 +115,7 @@ func (handler *ReplyHandler) UpdateReply(ctx echo.Context) error {
 		})
 	}
 
-	return ctx.JSON(http.StatusCreated, dto.ResponseJson{
+	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "reply edited successfully",
 		Data:    reply,
 	})

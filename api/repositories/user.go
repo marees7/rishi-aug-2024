@@ -37,6 +37,7 @@ func (db *userRepository) GetUsers(limit int, offset int, name string) (*[]model
 	if name != "" {
 		db.Where("name=?", name)
 	}
+
 	return &user, count, nil
 }
 
@@ -50,6 +51,7 @@ func (db *userRepository) GetUser(username string) (*models.User, *dto.ErrorResp
 	} else if data.Error != nil {
 		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
+	
 	return &user, nil
 }
 

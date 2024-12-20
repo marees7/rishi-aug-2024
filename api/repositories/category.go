@@ -38,6 +38,7 @@ func (db *categoryRepository) CreateCategory(category *models.Category) *dto.Err
 	if data.Error != nil {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
+
 	return nil
 }
 
@@ -50,6 +51,7 @@ func (db *categoryRepository) GetCategories(limit, offset int) (*[]models.Catego
 	if data.Error != nil {
 		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}, 0
 	}
+	
 	return &categories, nil, count
 }
 
@@ -91,5 +93,6 @@ func (db *categoryRepository) DeleteCategory(categoryID uuid.UUID) *dto.ErrorRes
 	} else if data.RowsAffected == 0 {
 		return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
+	
 	return nil
 }

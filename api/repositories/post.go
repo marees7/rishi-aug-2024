@@ -42,6 +42,7 @@ func (db *postRepository) CreatePost(post *models.Post) *dto.ErrorResponse {
 	if data.Error != nil {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
+
 	return nil
 }
 
@@ -60,13 +61,15 @@ func (db *postRepository) GetPosts(postID uuid.UUID, keywords map[string]interfa
 	if data.Error != nil {
 		return nil, 0, data.Error
 	}
-	if fromDate != "" && toDate == "" {
+
+	if fromDate != "" {
 		db.Preload("Comments").Where("created_at >= ?", fromDate)
-	} else if fromDate == "" && toDate != "" {
+	} else if fromDate == "" {
 		db.Preload("Comments").Where("created_at <= ?", toDate)
 	} else if title != "" {
 		db.Preload("Comments").Where("title LIKE '%' || ? || '%' ", title)
 	}
+
 	return &post, count, nil
 }
 
@@ -79,6 +82,7 @@ func (db *postRepository) GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorRes
 	} else if data.Error != nil {
 		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
+
 	return &post, nil
 }
 
@@ -124,5 +128,6 @@ func (db *postRepository) DeletePost(userID uuid.UUID, postID uuid.UUID, role st
 	} else if data.RowsAffected == 0 {
 		return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
+
 	return nil
 }

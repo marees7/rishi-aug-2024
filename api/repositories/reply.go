@@ -40,6 +40,7 @@ func (db *replyRepository) CreateReply(reply *models.Reply) *dto.ErrorResponse {
 	if data.Error != nil {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
+
 	return nil
 }
 
@@ -85,5 +86,6 @@ func (db *replyRepository) DeleteReply(replyID uuid.UUID, userID uuid.UUID, role
 	} else if data.RowsAffected == 0 {
 		return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
+	
 	return nil
 }

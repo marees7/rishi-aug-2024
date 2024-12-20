@@ -33,6 +33,7 @@ func (repo *authService) Signup(user *models.User) *dto.ErrorResponse {
 	if err := repo.AuthRepository.Signup(user); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -42,9 +43,10 @@ func (repo *authService) Login(login *dto.LoginRequest) (*models.User, *dto.Erro
 	if err != nil {
 		return nil, err
 	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password)); err != nil {
 		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: "password didn't match"}
 	}
-	return user, nil
 
+	return user, nil
 }

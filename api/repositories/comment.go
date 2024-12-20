@@ -41,6 +41,7 @@ func (db *commentRepository) CreateComment(comment *models.Comment) *dto.ErrorRe
 	if data.Error != nil {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
+
 	return nil
 }
 
@@ -69,8 +70,8 @@ func (db *commentRepository) GetComments(postID uuid.UUID, keywords map[string]i
 		//get the comments using content
 		db.Where("content LIKE '%' || ? || '%'", search)
 	}
-	return &comment, nil, count
 
+	return &comment, nil, count
 }
 
 // updates the existing comment
@@ -115,5 +116,6 @@ func (db *commentRepository) DeleteComment(userID uuid.UUID, commentID uuid.UUID
 	} else if data.RowsAffected == 0 {
 		return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
+	
 	return nil
 }

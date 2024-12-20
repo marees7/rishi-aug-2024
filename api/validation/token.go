@@ -43,5 +43,6 @@ func GetClaims(token *jwt.Token) (jwt.MapClaims, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid token")
 	}
+	
 	return claims, nil
 }
