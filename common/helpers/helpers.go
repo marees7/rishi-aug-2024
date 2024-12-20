@@ -19,6 +19,7 @@ func Pagination(limitStr string, offsetStr string) (int, int, error) {
 	} else if err != nil {
 		return 0, 0, err
 	}
+	offset = (offset - 1) * limit
 
 	return limit, offset, nil
 }

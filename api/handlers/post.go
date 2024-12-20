@@ -102,7 +102,7 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 	}
 
 	//call the retrieve post service
-	posts, err := handler.PostServices.GetPosts(postID, keywords)
+	posts, count, err := handler.PostServices.GetPosts(postID, keywords)
 	if err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusInternalServerError, dto.ResponseJson{
@@ -111,8 +111,11 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
-		Message: "Posts retrieved successfully",
-		Data:    posts,
+		Message:      "Posts retrieved successfully",
+		Data:         posts,
+		PageSize:     limit,
+		Page:         offset,
+		TotalRecords: count,
 	})
 }
 
@@ -144,7 +147,7 @@ func (handler *PostHandler) GetPost(ctx echo.Context) error {
 // update a existing post
 func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 	var post models.Post
-	id := (ctx.Param("post_id"))
+	id := ctx.Param("post_id")
 
 	postID, err := uuid.Parse(id)
 	if err != nil {
@@ -182,13 +185,13 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Post updated successfully",
-		Data:    post.PostID,
+		Data:    postID,
 	})
 }
 
 // Delete a existing post
 func (handler *PostHandler) DeletePost(ctx echo.Context) error {
-	id := (ctx.Param("post_id"))
+	id := ctx.Param("post_id")
 
 	postID, err := uuid.Parse(id)
 	if err != nil {
@@ -211,7 +214,7 @@ func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 	roleCtx := ctx.Get("role").(string)
 
 	//call the delete post service
-	post, errorResponse := handler.PostServices.DeletePost(userID, postID, roleCtx)
+	errorResponse := handler.PostServices.DeletePost(userID, postID, roleCtx)
 	if errorResponse != nil {
 		loggers.Warn.Println(errorResponse.Error)
 		return ctx.JSON(errorResponse.Status, dto.ResponseJson{
@@ -221,6 +224,6 @@ func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Post deleted successfully",
-		Data:    post.PostID,
+		Data:    postID,
 	})
 }

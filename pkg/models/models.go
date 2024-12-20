@@ -15,6 +15,7 @@ type User struct {
 	Password  string         `json:"password,omitempty" gorm:"not null;"`
 	Role      string         `json:"role,omitempty" gorm:"check:role='admin' or role='user'"`
 	Comments  []Comment      `json:"comments,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Replies   []Reply        `json:"replies,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Posts     []Post         `json:"posts,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CreatedAt time.Time      `json:"created_at,omitempty" gorm:"autoCreateTime;"`
 	UpdatedAt time.Time      `json:"updated_at,omitempty" gorm:"autoUpdateTime;"`
@@ -49,6 +50,17 @@ type Comment struct {
 	Content   string         `json:"content,omitempty" gorm:"not null;default:''"`
 	UserID    uuid.UUID      `json:"user_id,omitempty" gorm:"type:uuid"`
 	PostID    uuid.UUID      `json:"post_id,omitempty" gorm:"type:uuid"`
+	Replies   []Reply        `json:"replies,omitempty" gorm:"foreignKey:CommentID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CreatedAt time.Time      `json:"created_at,omitempty" gorm:"autoCreateTime;"`
+	UpdatedAt time.Time      `json:"updated_at,omitempty" gorm:"autoUpdateTime;"`
+	DeletedAt gorm.DeletedAt `json:"-"`
+}
+
+type Reply struct {
+	ReplyID   uuid.UUID      `json:"reply_id,omitempty" gorm:"type:uuid;primary_key"`
+	Content   string         `json:"content,omitempty" gorm:"not null;"`
+	UserID    uuid.UUID      `json:"user_id,omitempty" gorm:"type:uuid"`
+	CommentID uuid.UUID      `json:"comment_id,omitempty" gorm:"type:uuid"`
 	CreatedAt time.Time      `json:"created_at,omitempty" gorm:"autoCreateTime;"`
 	UpdatedAt time.Time      `json:"updated_at,omitempty" gorm:"autoUpdateTime;"`
 	DeletedAt gorm.DeletedAt `json:"-"`
@@ -71,5 +83,10 @@ func (comment *Comment) BeforeCreate(tx *gorm.DB) error {
 
 func (category *Category) BeforeCreate(tx *gorm.DB) error {
 	category.CategoryID = uuid.New()
+	return nil
+}
+
+func (reply *Reply) BeforeCreate(tx *gorm.DB) error {
+	reply.ReplyID = uuid.New()
 	return nil
 }

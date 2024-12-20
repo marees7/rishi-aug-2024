@@ -62,6 +62,7 @@ func ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 		//set the values inside claims into the context
 		c.Set("user_id", claims["user_id"])
 		c.Set("role", claims["role"])
+		c.Set("email", claims["email"])
 
 		return next(c)
 	}

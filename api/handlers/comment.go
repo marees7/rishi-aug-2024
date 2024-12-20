@@ -14,7 +14,7 @@ import (
 )
 
 type CommentHandler struct {
-	services.CommentService
+	services.CommentServices
 }
 
 // Create a new comment for a post
@@ -57,7 +57,7 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 	comment.UserID = userID
 
 	//call the create comment service
-	if err := handler.CommentService.CreateComment(&comment); err != nil {
+	if err := handler.CommentServices.CreateComment(&comment); err != nil {
 		loggers.Warn.Println(err.Error)
 		return ctx.JSON(err.Status, dto.ResponseJson{
 			Error: err.Error,
@@ -65,7 +65,7 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusCreated, dto.ResponseJson{
-		Message: "comment created successfully",
+		Message: "comment added successfully",
 		Data:    comment,
 	})
 }
@@ -108,7 +108,7 @@ func (handler *CommentHandler) GetComments(ctx echo.Context) error {
 	}
 
 	//call the retrieve comment service
-	comment, errorResponse := handler.CommentService.GetComments(postID, keywords)
+	comment, errorResponse, count := handler.CommentServices.GetComments(postID, keywords)
 	if errorResponse != nil {
 		loggers.Warn.Println(errorResponse.Error)
 		return ctx.JSON(errorResponse.Status, dto.ResponseJson{
@@ -117,8 +117,11 @@ func (handler *CommentHandler) GetComments(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
-		Message: "Comments retrieved successfully",
-		Data:    comment})
+		Message:      "Comments retrieved successfully",
+		Data:         comment,
+		PageSize:     limit,
+		Page:         offset,
+		TotalRecords: count})
 }
 
 // update an existing comment
@@ -153,7 +156,7 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	comment.UserID = userID
 
 	//call the update comment service
-	if err := handler.CommentService.UpdateComment(&comment, commentID); err != nil {
+	if err := handler.CommentServices.UpdateComment(&comment, commentID); err != nil {
 		loggers.Warn.Println(err.Error)
 		return ctx.JSON(err.Status, dto.ResponseJson{
 			Error: err.Error,
@@ -161,9 +164,9 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
-		Message: "comment updated successfully",
+		Message: "comment edited successfully",
 		Data: map[string]interface{}{
-			"comment_id": comment.CommentID,
+			"comment_id": commentID,
 		},
 	})
 }
@@ -193,7 +196,7 @@ func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 	roleCtx := ctx.Get("role").(string)
 
 	//call the delete comment service
-	comment, errorResponse := handler.CommentService.DeleteComment(userID, commentID, roleCtx)
+	errorResponse := handler.CommentServices.DeleteComment(userID, commentID, roleCtx)
 	if errorResponse != nil {
 		loggers.Warn.Println(errorResponse.Error)
 		return ctx.JSON(errorResponse.Status, dto.ResponseJson{
@@ -203,6 +206,6 @@ func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "comment deleted successfully",
-		Data:    comment.CommentID,
+		Data:    commentID,
 	})
 }

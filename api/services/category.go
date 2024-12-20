@@ -10,9 +10,9 @@ import (
 
 type CategoryServices interface {
 	CreateCategory(category *models.Category) *dto.ErrorResponse
-	GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse)
+	GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse, int64)
 	UpdateCategory(category *models.Category, categoryID uuid.UUID) *dto.ErrorResponse
-	DeleteCategory(categoryID uuid.UUID, role string) (*models.Category, *dto.ErrorResponse)
+	DeleteCategory(categoryID uuid.UUID) *dto.ErrorResponse
 }
 
 type userService struct {
@@ -29,9 +29,7 @@ func (repo *userService) CreateCategory(category *models.Category) *dto.ErrorRes
 }
 
 // retrieve every categories
-func (repo *userService) GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse) {
-	offset = (offset - 1) * limit
-
+func (repo *userService) GetCategories(limit, offset int) (*[]models.Category, *dto.ErrorResponse, int64) {
 	return repo.Category.GetCategories(limit, offset)
 }
 
@@ -41,6 +39,6 @@ func (repo *userService) UpdateCategory(category *models.Category, categoryID uu
 }
 
 // delete a existing category
-func (repo *userService) DeleteCategory(categoryID uuid.UUID, role string) (*models.Category, *dto.ErrorResponse) {
+func (repo *userService) DeleteCategory(categoryID uuid.UUID) *dto.ErrorResponse {
 	return repo.Category.DeleteCategory(categoryID)
 }

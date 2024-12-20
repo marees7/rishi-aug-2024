@@ -6,7 +6,7 @@ import (
 )
 
 func (db connection) Migrate() {
-	err := db.AutoMigrate(&models.User{}, &models.Category{}, &models.Post{}, &models.Comment{})
+	err := db.AutoMigrate(&models.User{}, &models.Category{}, &models.Post{}, &models.Comment{}, &models.Reply{})
 	if err != nil {
 		loggers.Error.Fatalln(err)
 	}

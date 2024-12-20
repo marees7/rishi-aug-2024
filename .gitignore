@@ -1,1 +1,2 @@
 .env
+pkg/loggers/logs.log

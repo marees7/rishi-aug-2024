@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"blogs/api/validation"
 	"blogs/common/constants"
 	"blogs/common/dto"
 	"blogs/pkg/models"
@@ -14,10 +13,10 @@ import (
 
 type PostRepository interface {
 	CreatePost(post *models.Post) *dto.ErrorResponse
-	GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error)
+	GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, int64, error)
 	GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorResponse)
 	UpdatePost(post *models.Post, postID uuid.UUID) *dto.ErrorResponse
-	DeletePost(userID uuid.UUID, postID uuid.UUID, role string) (*models.Post, *dto.ErrorResponse)
+	DeletePost(userID uuid.UUID, postID uuid.UUID, role string) *dto.ErrorResponse
 }
 
 type postRepository struct {
@@ -47,8 +46,9 @@ func (db *postRepository) CreatePost(post *models.Post) *dto.ErrorResponse {
 }
 
 // retrieve every users posts using either date or post id
-func (db *postRepository) GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error) {
+func (db *postRepository) GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, int64, error) {
 	var post []models.Post
+	var count int64
 	fromDate := keywords["fromDate"].(string)
 	toDate := keywords["toDate"].(string)
 	title := keywords["title"].(string)
@@ -56,20 +56,18 @@ func (db *postRepository) GetPosts(postID uuid.UUID, keywords map[string]interfa
 	offset := keywords["offset"].(int)
 
 	//check whether to use date filter or post id
-	data := db.Preload("Comments").Limit(limit).Offset(offset).Find(&post)
+	data := db.Model(post).Preload("Comments").Limit(limit).Offset(offset).Count(&count).Find(&post)
 	if data.Error != nil {
-		return nil, data.Error
+		return nil, 0, data.Error
 	}
-	if fromDate != "" && toDate != "" {
-		db.Preload("Comments").Where("created_at BETWEEN ? AND ?", fromDate, toDate)
-	} else if fromDate != "" && toDate == "" {
+	if fromDate != "" && toDate == "" {
 		db.Preload("Comments").Where("created_at >= ?", fromDate)
 	} else if fromDate == "" && toDate != "" {
 		db.Preload("Comments").Where("created_at <= ?", toDate)
 	} else if title != "" {
 		db.Preload("Comments").Where("title LIKE '%' || ? || '%' ", title)
 	}
-	return &post, nil
+	return &post, count, nil
 }
 
 func (db *postRepository) GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorResponse) {
@@ -94,43 +92,37 @@ func (db *postRepository) UpdatePost(post *models.Post, postID uuid.UUID) *dto.E
 		return &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	} else if postData.UserID != post.UserID {
 		return &dto.ErrorResponse{Status: http.StatusForbidden, Error: "cannot update other users post"}
-
 	}
 
 	//updates the record if the user created it or if it is the admin
-	if post.UserID == postData.UserID {
-		data := db.Where("post_id=?", postID).Updates(&post)
-		if data.Error != nil {
-			return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
-		} else if data.RowsAffected == 0 {
-			return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
-		}
+	data = db.Where("post_id=?", postID).Updates(&post)
+	if data.Error != nil {
+		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
+	} else if data.RowsAffected == 0 {
+		return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
-	post.PostID = postData.PostID
 
 	return nil
 }
 
 // delete a existing post
-func (db *postRepository) DeletePost(userID uuid.UUID, postID uuid.UUID, role string) (*models.Post, *dto.ErrorResponse) {
+func (db *postRepository) DeletePost(userID uuid.UUID, postID uuid.UUID, role string) *dto.ErrorResponse {
 	var postData models.Post
 
 	//check if the record exists and if the user can access it
 	data := db.Where("post_id=?", postID).First(&postData)
 	if data.Error != nil {
-		return nil, &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
+		return &dto.ErrorResponse{Status: http.StatusNotFound, Error: data.Error.Error()}
 	} else if postData.UserID != userID && role != constants.AdminRole {
-		return nil, &dto.ErrorResponse{Status: http.StatusForbidden, Error: "cannot delete other users post"}
+		return &dto.ErrorResponse{Status: http.StatusForbidden, Error: "cannot delete other users post"}
 	}
 
 	//deletes the record if the user created it or if it is the admin
-	if postData.UserID == userID || validation.ValidateRole(role) {
-		data := db.Where("post_id=?", postID).Delete(&postData)
-		if data.Error != nil {
-			return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
-		} else if data.RowsAffected == 0 {
-			return nil, &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
-		}
+	data = db.Where("post_id=?", postID).Delete(&postData)
+	if data.Error != nil {
+		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
+	} else if data.RowsAffected == 0 {
+		return &dto.ErrorResponse{Status: http.StatusNotModified, Error: "no changes were made"}
 	}
-	return &postData, nil
+	return nil
 }

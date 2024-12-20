@@ -80,6 +80,16 @@ func ValidateComment(comment *models.Comment) error {
 	return nil
 }
 
+// Validate the reply fields
+func ValidateReply(reply *models.Reply) error {
+	//check content
+	if reply.Content == "" {
+		return fmt.Errorf("content cannot be empty")
+	}
+
+	return nil
+}
+
 // Check role
 func ValidateRole(role string) bool {
 	return role == constants.AdminRole

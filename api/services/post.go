@@ -10,10 +10,10 @@ import (
 
 type PostServices interface {
 	CreatePost(post *models.Post) *dto.ErrorResponse
-	GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error)
+	GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, int64, error)
 	GetPost(postID uuid.UUID) (*models.Post, *dto.ErrorResponse)
 	UpdatePost(post *models.Post, postID uuid.UUID) *dto.ErrorResponse
-	DeletePost(userID uuid.UUID, postID uuid.UUID, role string) (*models.Post, *dto.ErrorResponse)
+	DeletePost(userID uuid.UUID, postID uuid.UUID, role string) *dto.ErrorResponse
 }
 
 type postService struct {
@@ -30,9 +30,7 @@ func (repo postService) CreatePost(post *models.Post) *dto.ErrorResponse {
 }
 
 // retrieve every users posts using date or post id
-func (repo postService) GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, error) {
-	keywords["offset"] = (keywords["offset"].(int) - 1) * keywords["limit"].(int)
-
+func (repo postService) GetPosts(postID uuid.UUID, keywords map[string]interface{}) (*[]models.Post, int64, error) {
 	return repo.PostRepository.GetPosts(postID, keywords)
 }
 
@@ -47,6 +45,6 @@ func (repo postService) UpdatePost(post *models.Post, postID uuid.UUID) *dto.Err
 }
 
 // delete a existing post
-func (repo postService) DeletePost(userID uuid.UUID, postID uuid.UUID, role string) (*models.Post, *dto.ErrorResponse) {
+func (repo postService) DeletePost(userID uuid.UUID, postID uuid.UUID, role string) *dto.ErrorResponse {
 	return repo.PostRepository.DeletePost(userID, postID, role)
 }

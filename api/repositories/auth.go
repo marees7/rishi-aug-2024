@@ -26,16 +26,18 @@ func InitAuthRepository(db *gorm.DB) AuthRepository {
 func (db *authRepository) Signup(user *models.User) *dto.ErrorResponse {
 	//check if the user already exists
 	data := db.Where("email=? OR username = ?", user.Email, user.Username).First(&user)
-	if data.RowsAffected > 0 {
+	if errors.Is(data.Error, gorm.ErrRecordNotFound) {
+		//create the user
+		data = db.Create(&user)
+		if data.Error != nil {
+			return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
+		}
+		return nil
+	} else if data.RowsAffected > 0 {
 		return &dto.ErrorResponse{Status: http.StatusConflict, Error: "user already exists"}
-	}
-
-	//create the user
-	data = db.Create(&user)
-	if data.Error != nil {
+	} else {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 	}
-	return nil
 }
 
 // login a new user

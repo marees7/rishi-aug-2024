@@ -12,7 +12,7 @@ import (
 func init() {
 	//load the env file
 	internals.LoadEnv()
-	
+
 	//load the logger
 	loggers.OpenLog()
 }
@@ -33,6 +33,7 @@ func main() {
 	routes.AdminRoute(server, db.DB)
 	routes.CommentRoute(server, db.DB)
 	routes.PostRoute(server, db.DB)
+	routes.ReplyRoute(server, db.DB)
 
 	//start the server
 	if err := server.Start(os.Getenv("HTTP_PORT")); err != nil {

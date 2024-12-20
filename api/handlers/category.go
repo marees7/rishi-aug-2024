@@ -71,7 +71,7 @@ func (handler *CategoryHandler) GetCategories(ctx echo.Context) error {
 	}
 
 	//call the retrieve category service
-	categories, errorResponse := handler.Category.GetCategories(limit, offset)
+	categories, errorResponse, count := handler.Category.GetCategories(limit, offset)
 	if errorResponse != nil {
 		loggers.Warn.Println(errorResponse.Error)
 		return ctx.JSON(errorResponse.Status, dto.ResponseJson{
@@ -79,8 +79,11 @@ func (handler *CategoryHandler) GetCategories(ctx echo.Context) error {
 		})
 	}
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
-		Message: "retrieved categories successfully",
-		Data:    categories,
+		Message:      "retrieved categories successfully",
+		Data:         categories,
+		PageSize:     limit,
+		Page:         offset,
+		TotalRecords: count,
 	})
 }
 
@@ -122,14 +125,14 @@ func (handler *CategoryHandler) UpdateCategory(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Category updated successfully",
 		Data: map[string]interface{}{
-			"category_id": category.CategoryID,
+			"category_id": categoryID,
 		},
 	})
 }
 
 // delete an existing category
 func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
-	id := (ctx.Param("category_id"))
+	id := ctx.Param("category_id")
 
 	categoryID, err := uuid.Parse(id)
 	if err != nil {
@@ -143,7 +146,7 @@ func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 
 	if validation.ValidateRole(roleCtx) {
 		//call the delete category service
-		category, err := handler.Category.DeleteCategory(categoryID, roleCtx)
+		err := handler.Category.DeleteCategory(categoryID)
 		if err != nil {
 			loggers.Warn.Println(err.Error)
 			return ctx.JSON(err.Status, dto.ResponseJson{
@@ -154,7 +157,7 @@ func (handler *CategoryHandler) DeleteCategory(ctx echo.Context) error {
 		return ctx.JSON(http.StatusOK, dto.ResponseJson{
 			Message: "Category deleted successfully",
 			Data: map[string]interface{}{
-				"category_id": category.CategoryID,
+				"category_id": categoryID,
 			},
 		})
 	} else {

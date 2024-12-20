@@ -18,7 +18,7 @@ func CommentRoute(server *echo.Echo, db *gorm.DB) {
 	commentService := services.InitCommentService(commentRepository)
 
 	//Initialize the handler struct
-	handler := &handlers.CommentHandler{CommentService: commentService}
+	handler := &handlers.CommentHandler{CommentServices: commentService}
 
 	//group user routes
 	users := server.Group("v1/users/comments")
