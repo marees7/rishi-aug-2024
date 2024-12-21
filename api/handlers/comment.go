@@ -20,8 +20,8 @@ type CommentHandler struct {
 // Create a new comment for a post
 func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 	var comment models.Comment
-	id := ctx.Param("post_id")
 
+	id := ctx.Param("post_id")
 	postID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -29,8 +29,8 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	comment.PostID = postID
 
+	comment.PostID = postID
 	if err := ctx.Bind(&comment); err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -46,7 +46,6 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 	}
 
 	userIDCtx := (ctx.Get("user_id")).(string)
-
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -54,8 +53,8 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	comment.UserID = userID
 
+	comment.UserID = userID
 	//call the create comment service
 	if err := handler.CommentServices.CreateComment(&comment); err != nil {
 		loggers.Warn.Println(err.Error)
@@ -73,6 +72,9 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 // retrieve every comments of the post
 func (handler *CommentHandler) GetComments(ctx echo.Context) error {
 	var postID uuid.UUID
+	offsetStr := ctx.QueryParam("offset")
+	limitStr := ctx.QueryParam("limit")
+	search := ctx.QueryParam("search")
 
 	id := ctx.Param("post_id")
 	if id == "" {
@@ -87,12 +89,8 @@ func (handler *CommentHandler) GetComments(ctx echo.Context) error {
 		}
 		postID = convPostID
 	}
-	search := ctx.QueryParam("search")
 
 	//pagination
-	offsetStr := ctx.QueryParam("offset")
-	limitStr := ctx.QueryParam("limit")
-
 	limit, offset, err := helpers.Pagination(limitStr, offsetStr)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -119,16 +117,16 @@ func (handler *CommentHandler) GetComments(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message:      "Comments retrieved successfully",
 		Data:         comment,
-		PageSize:     limit,
-		Page:         offset,
+		Limit:        limit,
+		Offset:       offset,
 		TotalRecords: count})
 }
 
 // update an existing comment
 func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	var comment models.Comment
-	id := (ctx.Param("comment_id"))
 
+	id := (ctx.Param("comment_id"))
 	commentID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -145,7 +143,6 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	}
 
 	userIDCtx := ctx.Get("user_id").(string)
-
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -153,8 +150,8 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	comment.UserID = userID
 
+	comment.UserID = userID
 	//call the update comment service
 	if err := handler.CommentServices.UpdateComment(&comment, commentID); err != nil {
 		loggers.Warn.Println(err.Error)
@@ -173,8 +170,9 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 
 // delete an existing comment
 func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
-	id := (ctx.Param("comment_id"))
+	roleCtx := ctx.Get("role").(string)
 
+	id := (ctx.Param("comment_id"))
 	commentID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -184,7 +182,6 @@ func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 	}
 
 	userIDCtx := ctx.Get("user_id").(string)
-
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -192,8 +189,6 @@ func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-
-	roleCtx := ctx.Get("role").(string)
 
 	//call the delete comment service
 	errorResponse := handler.CommentServices.DeleteComment(userID, commentID, roleCtx)

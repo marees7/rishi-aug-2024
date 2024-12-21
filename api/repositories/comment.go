@@ -66,8 +66,9 @@ func (db *commentRepository) GetComments(postID uuid.UUID, keywords map[string]i
 	if data.Error != nil {
 		return nil, &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}, 0
 	}
+
+	//get the comments using content
 	if search != "" {
-		//get the comments using content
 		db.Where("content LIKE '%' || ? || '%'", search)
 	}
 

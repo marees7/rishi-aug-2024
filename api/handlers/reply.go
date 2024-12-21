@@ -33,8 +33,8 @@ func (handler *ReplyHandler) CreateReply(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	userIDCtx := ctx.Get("user_id").(string)
 
+	userIDCtx := ctx.Get("user_id").(string)
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -44,7 +44,6 @@ func (handler *ReplyHandler) CreateReply(ctx echo.Context) error {
 	}
 
 	commentIDCtx := ctx.Param("comment_id")
-
 	commentID, err := uuid.Parse(commentIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -52,9 +51,9 @@ func (handler *ReplyHandler) CreateReply(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
+
 	reply.CommentID = commentID
 	reply.UserID = userID
-
 	//call the create post service
 	if err := handler.ReplyServices.CreateReply(&reply); err != nil {
 		loggers.Warn.Println(err.Error)
@@ -86,8 +85,8 @@ func (handler *ReplyHandler) UpdateReply(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	userIDCtx := ctx.Get("user_id").(string)
 
+	userIDCtx := ctx.Get("user_id").(string)
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -97,7 +96,6 @@ func (handler *ReplyHandler) UpdateReply(ctx echo.Context) error {
 	}
 
 	replyIDCtx := ctx.Param("reply_id")
-
 	replyID, err := uuid.Parse(replyIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -105,8 +103,8 @@ func (handler *ReplyHandler) UpdateReply(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	reply.UserID = userID
 
+	reply.UserID = userID
 	//call the create post service
 	if err := handler.ReplyServices.UpdateReply(&reply, replyID); err != nil {
 		loggers.Warn.Println(err.Error)
@@ -117,14 +115,13 @@ func (handler *ReplyHandler) UpdateReply(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "reply edited successfully",
-		Data:    reply,
+		Data:    map[string]interface{}{"reply_id": replyID},
 	})
 }
 
 // Delete a existing post
 func (handler *ReplyHandler) DeleteReply(ctx echo.Context) error {
 	id := ctx.Param("reply_id")
-
 	replyID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -134,7 +131,6 @@ func (handler *ReplyHandler) DeleteReply(ctx echo.Context) error {
 	}
 
 	userIDCtx := ctx.Get("user_id").(string)
-
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -144,7 +140,6 @@ func (handler *ReplyHandler) DeleteReply(ctx echo.Context) error {
 	}
 
 	roleCtx := ctx.Get("role").(string)
-
 	//call the delete reply service
 	errorResponse := handler.ReplyServices.DeleteReply(replyID, userID, roleCtx)
 	if errorResponse != nil {

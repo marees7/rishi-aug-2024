@@ -21,7 +21,7 @@ func CommentRoute(server *echo.Echo, db *gorm.DB) {
 	handler := &handlers.CommentHandler{CommentServices: commentService}
 
 	//group user routes
-	users := server.Group("v1/users/comments")
+	users := server.Group("v1/users/comment")
 	users.Use(middlewares.ValidateToken)
 
 	users.POST("/:post_id", handler.CreateComment)

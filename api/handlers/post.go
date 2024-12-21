@@ -36,7 +36,6 @@ func (handler *PostHandler) CreatePost(ctx echo.Context) error {
 	}
 
 	userIDCtx := ctx.Get("user_id").(string)
-
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -44,8 +43,8 @@ func (handler *PostHandler) CreatePost(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	post.UserID = userID
 
+	post.UserID = userID
 	//call the create post service
 	if err := handler.PostServices.CreatePost(&post); err != nil {
 		loggers.Warn.Println(err.Error)
@@ -65,6 +64,9 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 	var postID uuid.UUID
 	fromDate := ctx.QueryParam("start_date")
 	toDate := ctx.QueryParam("end_date")
+	offsetStr := ctx.QueryParam("offset")
+	limitStr := ctx.QueryParam("limit")
+	title := ctx.QueryParam("title")
 
 	id := ctx.QueryParam("post_id")
 	if id == "" {
@@ -79,12 +81,8 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 		}
 		postID = convPostID
 	}
-	title := ctx.QueryParam("title")
 
 	//pagination
-	offsetStr := ctx.QueryParam("offset")
-	limitStr := ctx.QueryParam("limit")
-
 	limit, offset, err := helpers.Pagination(limitStr, offsetStr)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -113,15 +111,14 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message:      "Posts retrieved successfully",
 		Data:         posts,
-		PageSize:     limit,
-		Page:         offset,
+		Limit:        limit,
+		Offset:       offset,
 		TotalRecords: count,
 	})
 }
 
 func (handler *PostHandler) GetPost(ctx echo.Context) error {
 	postCtx := ctx.Param("post_id")
-
 	postID, err := uuid.Parse(postCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -147,8 +144,8 @@ func (handler *PostHandler) GetPost(ctx echo.Context) error {
 // update a existing post
 func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 	var post models.Post
-	id := ctx.Param("post_id")
 
+	id := ctx.Param("post_id")
 	postID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -165,7 +162,6 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 	}
 
 	userIDCtx := ctx.Get("user_id").(string)
-
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -173,8 +169,8 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	post.UserID = userID
 
+	post.UserID = userID
 	//call the update post service
 	if err := handler.PostServices.UpdatePost(&post, postID); err != nil {
 		loggers.Warn.Println(err.Error)
@@ -185,14 +181,13 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, dto.ResponseJson{
 		Message: "Post updated successfully",
-		Data:    postID,
+		Data:    map[string]interface{}{"post_id": postID},
 	})
 }
 
 // Delete a existing post
 func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 	id := ctx.Param("post_id")
-
 	postID, err := uuid.Parse(id)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -202,7 +197,6 @@ func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 	}
 
 	userIDCtx := ctx.Get("user_id").(string)
-
 	userID, err := uuid.Parse(userIDCtx)
 	if err != nil {
 		loggers.Warn.Println(err)
@@ -212,7 +206,6 @@ func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 	}
 
 	roleCtx := ctx.Get("role").(string)
-
 	//call the delete post service
 	errorResponse := handler.PostServices.DeletePost(userID, postID, roleCtx)
 	if errorResponse != nil {

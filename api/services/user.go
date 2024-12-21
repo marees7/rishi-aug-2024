@@ -39,10 +39,12 @@ func (repo *adminService) UpdateUser(user *models.User) *dto.ErrorResponse {
 	if err != nil {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: "could not update password"}
 	}
+	
 	user.Password = string(hashedPass)
 
 	return repo.Users.UpdateUser(user)
 }
+
 func (repo *adminService) DeleteUser(email string) *dto.ErrorResponse {
 	return repo.Users.DeleteUser(email)
 }

@@ -20,6 +20,7 @@ type AdminHandler struct {
 func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
 	offsetStr := ctx.QueryParam("offset")
 	limitStr := ctx.QueryParam("limit")
+	name := ctx.QueryParam("name")
 
 	//pagination
 	limit, offset, err := helpers.Pagination(limitStr, offsetStr)
@@ -29,7 +30,6 @@ func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
 			Error: err.Error(),
 		})
 	}
-	name := ctx.QueryParam("name")
 
 	roleCtx := ctx.Get("role").(string)
 	if validation.ValidateRole(roleCtx) {
@@ -45,8 +45,8 @@ func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
 		return ctx.JSON(http.StatusOK, dto.ResponseJson{
 			Message:      "Users retrieved successfully",
 			Data:         users,
-			PageSize:     limit,
-			Page:         offset,
+			Limit:        limit,
+			Offset:       offset,
 			TotalRecords: count,
 		})
 	} else {
@@ -61,7 +61,6 @@ func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 	username := ctx.Param("username")
 
 	roleCtx := ctx.Get("role").(string)
-
 	if validation.ValidateRole(roleCtx) {
 		//call the get User By ID service
 		users, err := handler.AdminServices.GetUser(username)
@@ -69,7 +68,7 @@ func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 			loggers.Warn.Println(err.Error)
 			return ctx.JSON(err.Status, dto.ResponseJson{Error: err.Error})
 		}
-		
+
 		return ctx.JSON(http.StatusOK, dto.ResponseJson{
 			Message: "Users retrieved successfully",
 			Data:    users,
@@ -84,16 +83,16 @@ func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 // update a existing user
 func (handler *AdminHandler) UpdateUser(ctx echo.Context) error {
 	var user models.User
-	email := ctx.Get("email").(string)
 
+	email := ctx.Get("email").(string)
 	if err := ctx.Bind(&user); err != nil {
 		loggers.Warn.Println(err)
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
-	user.Email = email
 
+	user.Email = email
 	//check if the given info is valid
 	if err := validation.ValidateUser(&user); err != nil {
 		loggers.Warn.Println(err)

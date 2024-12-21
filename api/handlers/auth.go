@@ -57,6 +57,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 		})
 	}
 
+	//check if the email field is empty
 	if login.Email == "" {
 		loggers.Warn.Println("email cannot be empty")
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{
@@ -64,6 +65,7 @@ func (handler *AuthHandler) Login(ctx echo.Context) error {
 		})
 	}
 
+	//check if the password field is empty
 	if login.Password == "" {
 		loggers.Warn.Println("password cannot be empty")
 		return ctx.JSON(http.StatusBadRequest, dto.ResponseJson{

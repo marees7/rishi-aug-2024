@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// converts the string limit and offset into int and calculates the offset
 func Pagination(limitStr string, offsetStr string) (int, int, error) {
 	offset, err := strconv.Atoi(offsetStr)
 	if offsetStr == "" {
@@ -19,6 +20,7 @@ func Pagination(limitStr string, offsetStr string) (int, int, error) {
 	} else if err != nil {
 		return 0, 0, err
 	}
+	
 	offset = (offset - 1) * limit
 
 	return limit, offset, nil

@@ -28,8 +28,8 @@ func (repo *authService) Signup(user *models.User) *dto.ErrorResponse {
 	if err != nil {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: "could not generate password"}
 	}
+	
 	user.Password = string(hashedPass)
-
 	if err := repo.AuthRepository.Signup(user); err != nil {
 		return err
 	}

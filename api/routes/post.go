@@ -21,7 +21,7 @@ func PostRoute(server *echo.Echo, db *gorm.DB) {
 	handler := &handlers.PostHandler{PostServices: postService}
 
 	//group user routes
-	users := server.Group("v1/users/posts")
+	users := server.Group("v1/users/post")
 	users.Use(middlewares.ValidateToken)
 
 	users.POST("", handler.CreatePost)

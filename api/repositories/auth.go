@@ -32,6 +32,7 @@ func (db *authRepository) Signup(user *models.User) *dto.ErrorResponse {
 		if data.Error != nil {
 			return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: data.Error.Error()}
 		}
+		
 		return nil
 	} else if data.RowsAffected > 0 {
 		return &dto.ErrorResponse{Status: http.StatusConflict, Error: "user already exists"}

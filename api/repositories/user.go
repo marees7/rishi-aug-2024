@@ -34,6 +34,7 @@ func (db *userRepository) GetUsers(limit int, offset int, name string) (*[]model
 	if data.Error != nil {
 		return nil, 0, data.Error
 	}
+
 	if name != "" {
 		db.Where("name=?", name)
 	}
@@ -44,6 +45,7 @@ func (db *userRepository) GetUsers(limit int, offset int, name string) (*[]model
 // retrieve a single user record
 func (db *userRepository) GetUser(username string) (*models.User, *dto.ErrorResponse) {
 	var user models.User
+	
 	//retrieve a single user record along with comments and posts
 	data := db.Preload("Posts").Preload("Comments").Where("username=?", username).First(&user)
 	if errors.Is(data.Error, gorm.ErrRecordNotFound) {
