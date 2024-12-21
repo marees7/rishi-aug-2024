@@ -165,11 +165,11 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 ```
 
-## Sample API Request and Response
+## Sample API Requests and Responses
 
 ##### POST /signup
 
-request body:
+sample request:
 
 ```json
 {
@@ -181,7 +181,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -191,7 +191,7 @@ response body:
 
 ##### POST /login
 
-request body:
+sample request:
 
 ```json
 {
@@ -200,7 +200,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -211,7 +211,7 @@ response body:
 
 ##### PUT v1/user
 
-request body:
+sample request:
 
 ```json
 {
@@ -222,7 +222,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -235,7 +235,7 @@ response body:
 
 this will delete user if logged in and response back the deleted email
 
-response body:
+sample response:
 ```json
 {
     "message": "user deleted successfully",
@@ -247,7 +247,7 @@ response body:
 
 ##### POST v1/users/post
 
-request body:
+sample request:
 
 ```json
 {
@@ -258,7 +258,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -279,7 +279,7 @@ response body:
 
 ##### GET v1/users/post/:post_id
 
-response body:
+sample response:
 
 ```json
 {
@@ -317,7 +317,7 @@ response body:
 
 ##### GET v1/users/post
 
-response body:
+sample response:
 
 ```json
 {
@@ -359,7 +359,7 @@ response body:
 
 ##### PUT v1/users/post/:post_id
 
-request body:
+sample request:
 
 ```json
 {
@@ -369,7 +369,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -381,7 +381,8 @@ response body:
 ##### DELETE v1/users/post/:post_id
 
 this will delete post with given post id and response back the deleted post id
-response body:
+
+sample response:
 ```json
 {
     "message": "Post deleted successfully",
@@ -392,7 +393,7 @@ response body:
 
 ##### POST v1/admin/categories
 
-request body:
+sample request:
 
 ```json
 {
@@ -401,7 +402,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -419,7 +420,7 @@ response body:
 
 ##### GET v1/users/categories
 
-response body:
+sample response:
 
 ```json
 {
@@ -455,7 +456,7 @@ response body:
 
 ##### PUT v1/users/categories/:category_id
 
-request body:
+sample request:
 
 ```json
 {
@@ -464,7 +465,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -479,7 +480,7 @@ response body:
 
 this will delete category with given category id and response back the deleted category id
 
-response body:
+sample response:
 ```json
 {
     "message": "Category deleted successfully",
@@ -491,7 +492,7 @@ response body:
 
 ##### POST v1/users/comment/:post_id
 
-request body:
+sample request:
 
 ```json
 {
@@ -499,7 +500,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -518,7 +519,7 @@ response body:
 
 ##### GET v1/users/comment/:post_id
 
-response body:
+sample response:
 
 ```json
 {
@@ -567,7 +568,7 @@ response body:
 
 ##### PUT v1/users/comment/:comment_id
 
-request body:
+sample request:
 
 ```json
 {
@@ -575,7 +576,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -590,7 +591,7 @@ response body:
 
 this will delete comment with given comment id and response back the deleted comment id
 
-response body:
+sample response:
 ```json
 {
     "message": "comment deleted successfully",
@@ -600,7 +601,7 @@ response body:
 
 ##### POST v1/users/reply/:comment_id
 
-request body:
+sample request:
 
 ```json
 {
@@ -608,7 +609,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -627,7 +628,7 @@ response body:
 
 ##### PUT v1/users/reply/:reply_id
 
-request body:
+sample request:
 
 ```json
 {
@@ -635,7 +636,7 @@ request body:
 }
 ```
 
-response body:
+sample response:
 
 ```json
 {
@@ -650,7 +651,7 @@ response body:
 
 this will delete reply with given reply id and response back the deleted reply id
 
-response body:
+sample response:
 ```json
 {
     "message": "reply deleted successfully",
