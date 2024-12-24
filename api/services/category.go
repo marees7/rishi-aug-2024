@@ -1,9 +1,9 @@
 package services
 
 import (
-	"blogs/api/repositories"
-	"blogs/common/dto"
-	"blogs/pkg/models"
+	"github.com/marees7/rishi-aug-2024/api/repositories"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 
 	"github.com/google/uuid"
 )

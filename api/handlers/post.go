@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"blogs/api/services"
-	"blogs/api/validation"
-	"blogs/common/dto"
-	"blogs/common/helpers"
-	"blogs/pkg/loggers"
-	"blogs/pkg/models"
 	"net/http"
+
+	"github.com/marees7/rishi-aug-2024/api/services"
+	"github.com/marees7/rishi-aug-2024/api/validation"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/common/helpers"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -18,6 +19,20 @@ type PostHandler struct {
 }
 
 // create a new post
+//
+// @Summary 	Create post
+// @Description Create a new post
+// @ID 			Create-post
+// @Tags 		Posts
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		Create_post  body models.Post true "Create a new post"
+// @Success 	201 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/post [post]
 func (handler *PostHandler) CreatePost(ctx echo.Context) error {
 	var post models.Post
 
@@ -60,6 +75,24 @@ func (handler *PostHandler) CreatePost(ctx echo.Context) error {
 }
 
 // retrieve every users posts using date filter or specific id
+//
+// @Summary 	get posts
+// @Description get all posts
+// @ID 			get-posts
+// @Tags 		Posts
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		limit  query string false "Enter the limit"
+// @param 		offset  query string false "Enter the offset"
+// @param 		startDate  query string false "Enter the start date"
+// @param 		endDate  query string false "Enter the end date"
+// @param 		title  query string false "Enter the title to search"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/post [get]
 func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 	var postID uuid.UUID
 	fromDate := ctx.QueryParam("start_date")
@@ -117,6 +150,20 @@ func (handler *PostHandler) GetPosts(ctx echo.Context) error {
 	})
 }
 
+// retrieve a specific post using id
+//
+// @Summary 	get post
+// @Description get single posts
+// @ID 			get-post
+// @Tags 		Posts
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/post [get]
 func (handler *PostHandler) GetPost(ctx echo.Context) error {
 	postCtx := ctx.Param("post_id")
 	postID, err := uuid.Parse(postCtx)
@@ -142,6 +189,23 @@ func (handler *PostHandler) GetPost(ctx echo.Context) error {
 }
 
 // update a existing post
+//
+// @Summary 	Update post
+// @Description Update a specific post
+// @ID 			update-post
+// @Tags 		Posts
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		postID  path string true "Enter the post id"
+// @param 		Update_post  body models.Post true "Update the post"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/post/{postID} [put]
 func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 	var post models.Post
 
@@ -186,6 +250,22 @@ func (handler *PostHandler) UpdatePost(ctx echo.Context) error {
 }
 
 // Delete a existing post
+//
+// @Summary 	delete post
+// @Description delete a specific post
+// @ID 			delete-post
+// @Tags 		Posts
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		postID  path string true "Enter the post id"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/post/{postID} [delete]
 func (handler *PostHandler) DeletePost(ctx echo.Context) error {
 	id := ctx.Param("post_id")
 	postID, err := uuid.Parse(id)

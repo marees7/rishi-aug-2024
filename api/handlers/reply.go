@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"blogs/api/services"
-	"blogs/api/validation"
-	"blogs/common/dto"
-	"blogs/pkg/loggers"
-	"blogs/pkg/models"
 	"net/http"
+
+	"github.com/marees7/rishi-aug-2024/api/services"
+	"github.com/marees7/rishi-aug-2024/api/validation"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -16,7 +17,22 @@ type ReplyHandler struct {
 	services.ReplyServices
 }
 
-// create a new post
+// create a new reply
+//
+// @Summary 	Create reply
+// @Description Create a new reply
+// @ID 			Create-reply
+// @Tags 		Replies
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		commentID  path string true "Enter the comment id"
+// @param 		Create_reply  body models.Reply true "Enter the reply you want add in the comment"
+// @Success 	201 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/reply/{commentID} [post]
 func (handler *ReplyHandler) CreateReply(ctx echo.Context) error {
 	var reply models.Reply
 
@@ -69,6 +85,23 @@ func (handler *ReplyHandler) CreateReply(ctx echo.Context) error {
 }
 
 // update a existing post
+//
+// @Summary 	Update reply
+// @Description Update reply of a comment
+// @ID 			update-reply
+// @Tags 		Replies
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		replyID  path string true "Enter the reply id"
+// @param 		Update_reply  body models.Reply true "Update the reply"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/reply/{replyID} [put]
 func (handler *ReplyHandler) UpdateReply(ctx echo.Context) error {
 	var reply models.Reply
 
@@ -119,7 +152,23 @@ func (handler *ReplyHandler) UpdateReply(ctx echo.Context) error {
 	})
 }
 
-// Delete a existing post
+// Delete a existing reply
+//
+// @Summary 	delete reply
+// @Description delete a specific reply
+// @ID 			delete-reply
+// @Tags 		Replies
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		replyID  path string true "Enter the reply id"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/reply/{replyID} [delete]
 func (handler *ReplyHandler) DeleteReply(ctx echo.Context) error {
 	id := ctx.Param("reply_id")
 	replyID, err := uuid.Parse(id)

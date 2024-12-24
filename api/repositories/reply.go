@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"blogs/common/constants"
-	"blogs/common/dto"
-	"blogs/pkg/models"
+	"github.com/marees7/rishi-aug-2024/common/constants"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 	"errors"
 	"net/http"
 

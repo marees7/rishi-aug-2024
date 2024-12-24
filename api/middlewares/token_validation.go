@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"blogs/api/validation"
-	"blogs/common/dto"
-	"blogs/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/api/validation"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
 	"fmt"
 	"net/http"
 	"os"

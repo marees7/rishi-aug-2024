@@ -1,11 +1,12 @@
 package repositories
 
 import (
-	"blogs/common/constants"
-	"blogs/common/dto"
-	"blogs/pkg/models"
 	"errors"
 	"net/http"
+
+	"github.com/marees7/rishi-aug-2024/common/constants"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -64,7 +65,7 @@ func (db *postRepository) GetPosts(postID uuid.UUID, keywords map[string]interfa
 
 	if fromDate != "" {
 		db.Preload("Comments").Where("created_at >= ?", fromDate)
-	} else if fromDate == "" {
+	} else if toDate != "" {
 		db.Preload("Comments").Where("created_at <= ?", toDate)
 	} else if title != "" {
 		db.Preload("Comments").Where("title LIKE '%' || ? || '%' ", title)

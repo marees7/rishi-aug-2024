@@ -1,8 +1,8 @@
 package internals
 
 import (
-	"blogs/pkg/loggers"
-	"blogs/pkg/models"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 )
 
 //Migrate the model structs to the database

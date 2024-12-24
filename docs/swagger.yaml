@@ -1,0 +1,975 @@
+definitions:
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.ResponseJson:
+    properties:
+      data: {}
+      error:
+        type: string
+      limit:
+        type: integer
+      message:
+        type: string
+      offset:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  models.Category:
+    properties:
+      category_id:
+        type: string
+      category_name:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      posts:
+        items:
+          $ref: '#/definitions/models.Post'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  models.Comment:
+    properties:
+      comment_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      post_id:
+        type: string
+      replies:
+        items:
+          $ref: '#/definitions/models.Reply'
+        type: array
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.Post:
+    properties:
+      category_id:
+        type: string
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      content:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      post_id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.Reply:
+    properties:
+      comment_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      reply_id:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  models.User:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      created_at:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      posts:
+        items:
+          $ref: '#/definitions/models.Post'
+        type: array
+      replies:
+        items:
+          $ref: '#/definitions/models.Reply'
+        type: array
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    type: object
+host: localhost:5030
+info:
+  contact:
+    email: rsi28c@gmail.com
+    name: admin
+    url: https://github.com/marees7/rishi-aug-2024.git
+  description: This is a blog post api where users can create posts and add comments
+    for it
+  title: Blog posts API
+  version: 0.0.1
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: sign in a user and validate the token
+      parameters:
+      - description: Enter your login details
+        in: body
+        name: Login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      summary: log in a new user
+      tags:
+      - Auth
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Creates and register a new user
+      parameters:
+      - description: Enter your details
+        in: body
+        name: Signup
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      summary: Register a new user
+      tags:
+      - Auth
+  /v1/admin/categories:
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      operationId: create-category
+      parameters:
+      - description: Enter the category details that need to be created
+        in: body
+        name: CreateDetails
+        required: true
+        schema:
+          $ref: '#/definitions/models.Category'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Create categories
+      tags:
+      - Category
+  /v1/admin/categories/{categoryID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a existing category
+      operationId: Delete-category
+      parameters:
+      - description: Enter the category id
+        in: path
+        name: categoryID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Delete categories
+      tags:
+      - Category
+    put:
+      consumes:
+      - application/json
+      description: Update a existing category
+      operationId: update-category
+      parameters:
+      - description: Enter the category id
+        in: path
+        name: categoryID
+        required: true
+        type: string
+      - description: Enter the changes need to be done
+        in: body
+        name: UpdateDetails
+        required: true
+        schema:
+          $ref: '#/definitions/models.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Update categories
+      tags:
+      - Category
+  /v1/admin/users:
+    get:
+      consumes:
+      - application/json
+      description: get every users records
+      operationId: get-users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: get users
+      tags:
+      - users
+  /v1/admin/users/{username}:
+    get:
+      consumes:
+      - application/json
+      description: get a single user record
+      operationId: get-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: get user
+      tags:
+      - users
+  /v1/users:
+    delete:
+      consumes:
+      - application/json
+      description: delete a logged in user
+      operationId: delete-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: delete user
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: update a logged in user
+      operationId: update-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: update user
+      tags:
+      - users
+  /v1/users/categories:
+    get:
+      description: Get all the available categories
+      operationId: get-category
+      parameters:
+      - description: Enter the limit
+        in: query
+        name: limit
+        type: string
+      - description: Enter the offset
+        in: query
+        name: offset
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Get categories
+      tags:
+      - Category
+  /v1/users/comment/{commentID}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a specific comment
+      operationId: delete-comment
+      parameters:
+      - description: Enter the comment id
+        in: path
+        name: commentID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: delete comment
+      tags:
+      - Comments
+    put:
+      consumes:
+      - application/json
+      description: Update comments in a post
+      operationId: update-comment
+      parameters:
+      - description: Enter the comment id
+        in: path
+        name: commentID
+        required: true
+        type: string
+      - description: Update the comment
+        in: body
+        name: Update_comment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Update comment
+      tags:
+      - Comments
+  /v1/users/comment/{postID}:
+    get:
+      consumes:
+      - application/json
+      description: Get comments in a post
+      operationId: get-comment
+      parameters:
+      - description: Enter the post id
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: Enter the limit
+        in: query
+        name: limit
+        type: string
+      - description: Enter the offset
+        in: query
+        name: offset
+        type: string
+      - description: Enter a comment phrase you want to search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Get comment
+      tags:
+      - Comments
+    post:
+      consumes:
+      - application/json
+      description: Create a new comment
+      operationId: Create-comment
+      parameters:
+      - description: Enter the post id
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: Enter the message you want add in the comment
+        in: body
+        name: Create_comment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Create comment
+      tags:
+      - Comments
+  /v1/users/post:
+    get:
+      consumes:
+      - application/json
+      description: get single posts
+      operationId: get-post
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: get post
+      tags:
+      - Posts
+    post:
+      consumes:
+      - application/json
+      description: Create a new post
+      operationId: Create-post
+      parameters:
+      - description: Create a new post
+        in: body
+        name: Create_post
+        required: true
+        schema:
+          $ref: '#/definitions/models.Post'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Create post
+      tags:
+      - Posts
+  /v1/users/post/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a specific post
+      operationId: delete-post
+      parameters:
+      - description: Enter the post id
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: delete post
+      tags:
+      - Posts
+    put:
+      consumes:
+      - application/json
+      description: Update a specific post
+      operationId: update-post
+      parameters:
+      - description: Enter the post id
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: Update the post
+        in: body
+        name: Update_post
+        required: true
+        schema:
+          $ref: '#/definitions/models.Post'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Update post
+      tags:
+      - Posts
+  /v1/users/reply/{commentID}:
+    post:
+      consumes:
+      - application/json
+      description: Create a new reply
+      operationId: Create-reply
+      parameters:
+      - description: Enter the comment id
+        in: path
+        name: commentID
+        required: true
+        type: string
+      - description: Enter the reply you want add in the comment
+        in: body
+        name: Create_reply
+        required: true
+        schema:
+          $ref: '#/definitions/models.Reply'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Create reply
+      tags:
+      - Replies
+  /v1/users/reply/{replyID}:
+    delete:
+      consumes:
+      - application/json
+      description: delete a specific reply
+      operationId: delete-reply
+      parameters:
+      - description: Enter the reply id
+        in: path
+        name: replyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: delete reply
+      tags:
+      - Replies
+    put:
+      consumes:
+      - application/json
+      description: Update reply of a comment
+      operationId: update-reply
+      parameters:
+      - description: Enter the reply id
+        in: path
+        name: replyID
+        required: true
+        type: string
+      - description: Update the reply
+        in: body
+        name: Update_reply
+        required: true
+        schema:
+          $ref: '#/definitions/models.Reply'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseJson'
+      security:
+      - JWT: []
+      summary: Update reply
+      tags:
+      - Replies
+swagger: "2.0"

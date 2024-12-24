@@ -1,7 +1,6 @@
 package loggers
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,17 +12,8 @@ var (
 	Error *log.Logger
 )
 
-//handle panic if occurred
-func recoverPanic() {
-	if r := recover(); r != nil {
-		fmt.Println("recovered from ", r)
-	}
-}
-
-//creates a new log file or opens if file already exists
+// creates a new log file or opens if file already exists
 func OpenLog() {
-	defer recoverPanic()
-
 	//get the working directory file path
 	wd, err := os.Getwd()
 	if err != nil {

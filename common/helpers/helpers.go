@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"blogs/common/constants"
+	"github.com/marees7/rishi-aug-2024/common/constants"
 	"strconv"
 )
 

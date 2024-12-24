@@ -1,9 +1,9 @@
 package validation
 
 import (
-	"blogs/common/dto"
-	"blogs/pkg/loggers"
-	"blogs/pkg/models"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 	"fmt"
 	"os"
 	"time"

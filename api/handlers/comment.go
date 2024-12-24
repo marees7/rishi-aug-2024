@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"blogs/api/services"
-	"blogs/api/validation"
-	"blogs/common/dto"
-	"blogs/common/helpers"
-	"blogs/pkg/loggers"
-	"blogs/pkg/models"
 	"net/http"
+
+	"github.com/marees7/rishi-aug-2024/api/services"
+	"github.com/marees7/rishi-aug-2024/api/validation"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/common/helpers"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -18,6 +19,21 @@ type CommentHandler struct {
 }
 
 // Create a new comment for a post
+//
+// @Summary 	Create comment
+// @Description Create a new comment
+// @ID 			Create-comment
+// @Tags 		Comments
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		postID  path string true "Enter the post id"
+// @param 		Create_comment  body models.Comment true "Enter the message you want add in the comment"
+// @Success 	201 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/comment/{postID} [post]
 func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 	var comment models.Comment
 
@@ -70,6 +86,23 @@ func (handler *CommentHandler) CreateComment(ctx echo.Context) error {
 }
 
 // retrieve every comments of the post
+//
+// @Summary 	Get comment
+// @Description Get comments in a post
+// @ID 			get-comment
+// @Tags 		Comments
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		postID  path string true "Enter the post id"
+// @param 		limit  query string false "Enter the limit"
+// @param 		offset  query string false "Enter the offset"
+// @param 		search  query string false "Enter a comment phrase you want to search"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/comment/{postID} [get]
 func (handler *CommentHandler) GetComments(ctx echo.Context) error {
 	var postID uuid.UUID
 	offsetStr := ctx.QueryParam("offset")
@@ -123,6 +156,23 @@ func (handler *CommentHandler) GetComments(ctx echo.Context) error {
 }
 
 // update an existing comment
+//
+// @Summary 	Update comment
+// @Description Update comments in a post
+// @ID 			update-comment
+// @Tags 		Comments
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		commentID  path string true "Enter the comment id"
+// @param 		Update_comment  body models.Comment true "Update the comment"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/comment/{commentID} [put]
 func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 	var comment models.Comment
 
@@ -169,6 +219,22 @@ func (handler *CommentHandler) UpdateComment(ctx echo.Context) error {
 }
 
 // delete an existing comment
+//
+// @Summary 	delete comment
+// @Description delete a specific comment
+// @ID 			delete-comment
+// @Tags 		Comments
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @param 		commentID  path string true "Enter the comment id"
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users/comment/{commentID} [delete]
 func (handler *CommentHandler) DeleteComment(ctx echo.Context) error {
 	roleCtx := ctx.Get("role").(string)
 
