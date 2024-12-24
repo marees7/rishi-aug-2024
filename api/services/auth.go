@@ -1,10 +1,11 @@
 package services
 
 import (
-	"blogs/api/repositories"
-	"blogs/common/dto"
-	"blogs/pkg/models"
 	"net/http"
+
+	"github.com/marees7/rishi-aug-2024/api/repositories"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -28,7 +29,7 @@ func (repo *authService) Signup(user *models.User) *dto.ErrorResponse {
 	if err != nil {
 		return &dto.ErrorResponse{Status: http.StatusInternalServerError, Error: "could not generate password"}
 	}
-	
+
 	user.Password = string(hashedPass)
 	if err := repo.AuthRepository.Signup(user); err != nil {
 		return err

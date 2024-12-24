@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"blogs/api/handlers"
-	"blogs/api/repositories"
-	"blogs/api/services"
+	"github.com/marees7/rishi-aug-2024/api/handlers"
+	"github.com/marees7/rishi-aug-2024/api/repositories"
+	"github.com/marees7/rishi-aug-2024/api/services"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
