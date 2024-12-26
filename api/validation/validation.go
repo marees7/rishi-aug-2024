@@ -1,8 +1,8 @@
 package validation
 
 import (
-	"blogs/common/constants"
-	"blogs/pkg/models"
+	"github.com/marees7/rishi-aug-2024/common/constants"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 	"fmt"
 
 	"github.com/go-playground/validator/v10"

@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"blogs/api/services"
-	"blogs/api/validation"
-	"blogs/common/dto"
-	"blogs/common/helpers"
-	"blogs/pkg/loggers"
-	"blogs/pkg/models"
 	"net/http"
+
+	"github.com/marees7/rishi-aug-2024/api/services"
+	"github.com/marees7/rishi-aug-2024/api/validation"
+	"github.com/marees7/rishi-aug-2024/common/dto"
+	"github.com/marees7/rishi-aug-2024/common/helpers"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/pkg/models"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,6 +18,19 @@ type AdminHandler struct {
 }
 
 // retrieve every users records
+//
+// @Summary 	get users
+// @Description get every users records
+// @ID 			get-users
+// @Tags 		users
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/admin/users [get]
 func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
 	offsetStr := ctx.QueryParam("offset")
 	limitStr := ctx.QueryParam("limit")
@@ -57,6 +71,20 @@ func (handler *AdminHandler) GetUsers(ctx echo.Context) error {
 }
 
 // retrieve a single user record
+//
+// @Summary 	get user
+// @Description get a single user record
+// @ID 			get-user
+// @Tags 		users
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		403 {object} dto.ResponseJson
+// @Failure		404 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/admin/users/{username} [get]
 func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 	username := ctx.Param("username")
 
@@ -81,6 +109,19 @@ func (handler *AdminHandler) GetUser(ctx echo.Context) error {
 }
 
 // update a existing user
+//
+// @Summary 	update user
+// @Description update a logged in user
+// @ID 			update-user
+// @Tags 		users
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users [put]
 func (handler *AdminHandler) UpdateUser(ctx echo.Context) error {
 	var user models.User
 
@@ -116,6 +157,19 @@ func (handler *AdminHandler) UpdateUser(ctx echo.Context) error {
 }
 
 // Delete a existing user
+//
+// @Summary 	delete user
+// @Description delete a logged in user
+// @ID 			delete-user
+// @Tags 		users
+// @Security 	JWT
+// @Accept		json
+// @Produce 	json
+// @Success 	200 {object} dto.ResponseJson
+// @Failure		400 {object} dto.ResponseJson
+// @Failure		304 {object} dto.ResponseJson
+// @Failure		500 {object} dto.ResponseJson
+// @Router 		/v1/users [delete]
 func (handler *AdminHandler) DeleteUser(ctx echo.Context) error {
 	email := ctx.Get("email").(string)
 

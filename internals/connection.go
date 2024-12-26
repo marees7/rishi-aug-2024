@@ -1,7 +1,7 @@
 package internals
 
 import (
-	"blogs/pkg/loggers"
+	"github.com/marees7/rishi-aug-2024/pkg/loggers"
 	"fmt"
 	"os"
 
